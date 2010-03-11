@@ -6,13 +6,13 @@
 
 %define beta_or_rc 0
 %define actual_release 1
-%define svnrevision 18495
+%define svnrevision 18984
 %define with_ldap 1
 %define with_xmlto 1
 
 Summary:	Zarafa Outlook Sharing and Open Source Collaboration
 Name:		zarafa
-Version:	6.30.10
+Version:	6.30.11
 %if %{beta_or_rc}
 Release:	%mkrel 0.%{actual_release}.svn%{svnrevision}
 %else
@@ -356,6 +356,9 @@ rm -f %{buildroot}%{_libdir}/{,php/extensions,%{name}}/*.la
 
 # Remove files that are anyway in %doc or %{_datadir}/%{name}/
 rm -rf %{buildroot}%{_datadir}/doc/%{name}/
+
+# nuke files that belongs to a licensed release
+rm -f %{buildroot}%{_mandir}/man1/zarafa-report.1*
 
 %find_lang %{name}
 
