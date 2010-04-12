@@ -1,11 +1,9 @@
-%define _disable_ld_no_undefined 1
-
 %define	major 0
 %define	libname %mklibname %{name} %{major}
 %define develname %mklibname %{name} -d
 
 %define beta_or_rc 0
-%define actual_release 1
+%define actual_release 2
 %define svnrevision 18984
 %define with_ldap 1
 %define with_xmlto 1
