@@ -238,6 +238,7 @@ MAPI libraries by Zarafa.
 Summary:	Perl Mapi extension libraries by Zarafa
 Group:		Development/Perl
 Requires:	perl
+Conflicts:	%{_lib}zarafa-devel < 6.30.12-2
 
 %description -n perl-libmapi
 Perl MAPI extension libraries by Zarafa.
@@ -524,7 +525,6 @@ fi
 %{_libdir}/libicalmapi.so
 %{_libdir}/libinetmapi.so
 %{_libdir}/libmapi.so
-%{_libdir}/libperlmapi.so
 %{_libdir}/libcommon_mapi.a
 %{_libdir}/libcommon_ssl.a
 %{_libdir}/libcommon_util.a
@@ -640,7 +640,7 @@ fi
 %files -n perl-libmapi
 %defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
-%{_libdir}/libperlmapi.so.*
+%{_libdir}/libperlmapi.so
 
 %files -n php-mapi
 %defattr(-,root,root,-)
