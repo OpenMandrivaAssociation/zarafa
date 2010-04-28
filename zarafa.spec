@@ -3,14 +3,14 @@
 %define develname %mklibname %{name} -d
 
 %define beta_or_rc 0
-%define actual_release 2
+%define actual_release 1
 %define svnrevision 18984
 %define with_ldap 1
 %define with_xmlto 1
 
 Summary:	Zarafa Outlook Sharing and Open Source Collaboration
 Name:		zarafa
-Version:	6.30.12
+Version:	6.30.13
 %if %{beta_or_rc}
 Release:	%mkrel 0.%{actual_release}.svn%{svnrevision}
 %else
@@ -32,9 +32,6 @@ Patch0:		zarafa-6.30.4-package.patch
 Patch1:		zarafa-6.30.4-perl.patch
 Patch2:		zarafa-6.30.10-undefined-symbol.patch
 Patch3:		zarafa-6.30.10-chmod.patch
-# Patch 4 and 5 are backports from upstream
-Patch4:		zarafa-6.30.10-fortify.patch
-Patch5:		zarafa-6.30.10-long-ulong.patch
 # http://www.brodowski.org/zarafa/php-mapi/6.30.10.18495/18495_patch.diff
 Patch10:	zarafa-6.30.4-brodowski.patch
 Patch11:	zarafa-6.30.10-linkage_fix.diff
@@ -259,8 +256,6 @@ PHP MAPI extension by Zarafa to enable MAPI communication in PHP.
 %patch1 -p1 -b .perl
 %patch2 -p1 -b .symbol
 %patch3 -p1 -b .chmod
-%patch4 -p1 -b .fortify
-%patch5 -p1 -b .long-ulong
 #%%patch10 -p5 -b .brodowski
 %patch11 -p0
 
