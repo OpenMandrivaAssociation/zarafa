@@ -4,13 +4,14 @@
 
 %define beta_or_rc 0
 %define actual_release 1
-%define svnrevision 18984
+%define svnrevision 20653
+%define with_clucene 1
 %define with_ldap 1
 %define with_xmlto 1
 
 Summary:	Zarafa Outlook Sharing and Open Source Collaboration
 Name:		zarafa
-Version:	6.30.13
+Version:	6.40.0
 %if %{beta_or_rc}
 Release:	%mkrel 0.%{actual_release}.svn%{svnrevision}
 %else
@@ -27,14 +28,17 @@ URL:		http://www.zarafa.com/
 # http://www.zarafa.com/download-community -> "Zarafa Source Package"
 Source0:	%{name}-%{version}.tar.gz
 Source1:	%{name}.ini
-Patch0:		zarafa-6.30.4-package.patch
-# Patch 1, 2 and 3 were sent to upstream
-Patch1:		zarafa-6.30.4-perl.patch
-Patch2:		zarafa-6.30.10-undefined-symbol.patch
-Patch3:		zarafa-6.30.10-chmod.patch
-# http://www.brodowski.org/zarafa/php-mapi/6.30.10.18495/18495_patch.diff
-Patch10:	zarafa-6.30.4-brodowski.patch
-Patch11:	zarafa-6.30.10-linkage_fix.diff
+Source2:	%{name}.logrotate
+Source3:	%{name}-webaccess.conf
+Patch0:		zarafa-6.40.0-package.patch
+# Patch 1, 2, 3, 4 and 5 were sent to upstream
+Patch1:		zarafa-6.40.0-undefined-symbol.patch
+Patch2:		zarafa-6.40.0-openssl.patch
+Patch3:		zarafa-6.40.0-krb5.patch
+Patch4:		zarafa-6.40.0-clucene.patch
+Patch5:		zarafa-6.40.0-pthread.patch
+# mandriva patches
+Patch100:	zarafa-6.30.10-linkage_fix.diff
 BuildRequires:	bison
 BuildRequires:	byacc
 BuildRequires:	curl-devel
@@ -50,6 +54,9 @@ BuildRequires:	pam-devel
 BuildRequires:	perl
 BuildRequires:	perl-devel
 BuildRequires:	php-devel >= 3:5.2.0
+%if %{with_clucene}
+BuildRequires:	clucene-devel >= 0.9.21b
+%endif
 %if %{with_ldap}
 BuildRequires:	openldap-devel
 %endif
@@ -231,16 +238,17 @@ Requires(postun):   /sbin/ldconfig
 %description -n %{libname}
 MAPI libraries by Zarafa.
 
-%package -n perl-libmapi
+%package -n	perl-MAPI
 Summary:	Perl Mapi extension libraries by Zarafa
 Group:		Development/Perl
 Requires:	perl
 Conflicts:	%{_lib}zarafa-devel < 6.30.12-2
+Obsoletes:	perl-libmapi
 
-%description -n perl-libmapi
+%description -n	perl-MAPI
 Perl MAPI extension libraries by Zarafa.
 
-%package -n php-mapi
+%package -n	php-mapi
 Summary:	A PHP Mapi client by Zarafa
 Group:		Development/PHP
 # Bug: Without mod_ssl, reloading httpd causes core dump
@@ -250,14 +258,57 @@ Requires:	apache-mod_php >= 5.2
 %description -n php-mapi
 PHP MAPI extension by Zarafa to enable MAPI communication in PHP.
 
+%if %{with_clucene}
+%package	indexer
+Summary:	The Zarafa Indexing service
+Group:		System/Servers
+Requires:	zarafa-common >= %{version}-%{release}
+Requires:	catdoc
+Requires:	xsltproc
+Requires:	lynx
+Requires:	unzip
+Requires:	poppler
+Requires:	file
+Requires(post):  /sbin/chkconfig
+Requires(preun): /sbin/service
+Requires(preun):  /sbin/chkconfig
+Requires(postun): /sbin/service
+
+%description	indexer
+The zarafa-indexer package includes the Zarafa Indexing service for fast
+and full-text searching. Using CLucene search engine, this service makes
+an index per user of messages and attachments for the Zarafa server. At
+search queries, the server will use this index to quickly find messages,
+items and even in contents of attached documents.
+%endif
+
+%package	webaccess
+Summary:	Zarafa Webaccess featuring a 'Look & Feel' similar to Outlook
+Group:		Development/PHP
+Requires:	apache-mod_php >= 5.2
+Requires:	php-mapi >= %{version}-%{release}
+BuildArch:	noarch
+
+%description	webaccess
+Zarafa Webaccess features the familiar Outlook 'Look & Feel' interface
+and you can keep using the features in Outlook that have always allowed
+you to work efficiently. View your e-mail, calendar and contacts via a
+web browser. And opening your colleagues calendar or sending a meeting
+request is only a piece of cake. The Zarafa Webaccess is using the ajax
+technology to give a more interactive feeling to the users.
+
 %prep
+
 %setup -q
 %patch0 -p1 -b .package
-%patch1 -p1 -b .perl
-%patch2 -p1 -b .symbol
-%patch3 -p1 -b .chmod
-#%%patch10 -p5 -b .brodowski
-%patch11 -p0
+%patch1 -p1 -b .undefined-symbol
+%patch2 -p1 -b .openssl
+%patch3 -p1 -b .krb5
+%patch4 -p1 -b .clucene
+%patch5 -p1 -b .pthread
+
+# mandriva patches
+%patch100 -p0
 
 %build
 # Needed to get rid of rpath
@@ -269,6 +320,13 @@ export CFLAGS
 %configure2_5x \
     --with-userscript-prefix=%{_sysconfdir}/%{name}/userscripts \
     --with-quotatemplate-prefix=%{_sysconfdir}/%{name}/quotamail \
+    --with-indexerscripts-prefix=%{_datadir}/%{name}/indexerscripts \
+%if %{with_clucene}
+    --with-clucene-lib-prefix=%{_libdir} \
+    --with-clucene-include-prefix=%{_includedir} \
+%else
+    --with-clucene-lib-prefix= \
+%endif
     --enable-release \
     --disable-static \
     --disable-testtools \
@@ -284,50 +342,46 @@ make \
     datarootdir=%{_datadir} \
     DESTDIR=%{buildroot} \
     INSTALL='install -p' \
-    install
+    install \
+    install-ajax-webaccess
 
 # Nuke all overlefts from licensed, managed or other proprietary items
-rm -rf %{buildroot}%{_sysconfdir}/%{name}/report-ca
-rm -f %{buildroot}%{_mandir}/man?/zarafa-{backup,restore,ldapms.cfg,licensed{,.cfg}}.*
+rm -rf %{buildroot}%{_sysconfdir}/%{name}/{license,licensed.cfg,report-ca}
+rm -f %{buildroot}%{_mandir}/man?/zarafa-{backup,restore,report,ldapms.cfg,licensed{,.cfg}}.*
 
 # Move all the initscripts to their appropriate place and
 # ensure that all services are off by default at boot time
+rm -rf %{buildroot}%{_sysconfdir}/init.d/
 mkdir -p %{buildroot}%{_sysconfdir}/rc.d/init.d/
-for service in server spooler dagent gateway monitor ical; do
-    if [ -f %{buildroot}%{_datadir}/doc/%{name}/%{name}-$service.init.fc ]; then
-        sed -e 's@345@-@' %{buildroot}%{_datadir}/doc/%{name}/%{name}-$service.init.fc > \
+for service in dagent gateway ical indexer monitor server spooler; do
+    if [ -f installer/linux/%{name}-$service.init.rhel ]; then
+        sed -e 's@345@-@' installer/linux/%{name}-$service.init.rhel > \
             %{buildroot}%{_sysconfdir}/rc.d/init.d/%{name}-$service
         chmod 755 %{buildroot}%{_sysconfdir}/rc.d/init.d/%{name}-$service
-        touch -c -r %{buildroot}{%{_datadir}/doc/%{name}/%{name}-$service.init.fc,%{_sysconfdir}/rc.d/init.d/%{name}-$service}
+        touch -c -r installer/linux/%{name}-$service.init.rhel %{buildroot}%{_sysconfdir}/rc.d/init.d/%{name}-$service
     fi
 done
 
 # Move the configuration files to their correct place and handle
 # /usr/lib vs. /usr/lib64 for all architectures correct and set
 # run_as_user, run_as_group and local_admin_users values correct
-for config in %{buildroot}%{_datadir}/doc/%{name}/*.cfg; do
+for config in %{buildroot}%{_datadir}/doc/%{name}/example-config/*.cfg; do
     config=$(basename $config)
-    if [ -f %{buildroot}%{_datadir}/doc/%{name}/$config ]; then
+    if [ -f %{buildroot}%{_datadir}/doc/%{name}/example-config/$config ]; then
         sed -e 's@\(run_as_\(user\|group\)[[:space:]]*=\).*@\1 %{name}@' -e 's@/usr/lib/zarafa@%{_libdir}/%{name}@' \
             -e 's@\(local_admin_users[[:space:]]*=[[:space:]]*root.*\)@\1 %{name}@' \
-                %{buildroot}%{_datadir}/doc/%{name}/$config > %{buildroot}%{_sysconfdir}/%{name}/$config
+                %{buildroot}%{_datadir}/doc/%{name}/example-config/$config > %{buildroot}%{_sysconfdir}/%{name}/$config
         chmod 640 %{buildroot}%{_sysconfdir}/%{name}/$config
-        touch -c -r %{buildroot}%{_datadir}/doc/%{name}/$config %{buildroot}%{_sysconfdir}/%{name}/$config
+        touch -c -r %{buildroot}%{_datadir}/doc/%{name}/example-config/$config %{buildroot}%{_sysconfdir}/%{name}/$config
     fi
 done
 
-# Move the logrotate configuration file to it's correct place
-mkdir -p %{buildroot}%{_sysconfdir}/logrotate.d/
-sed -e 's@\(}\)@        create 0644 %{name} %{name}\n\1@' -e '1,6d' \
-  %{buildroot}%{_datadir}/doc/%{name}/%{name}.logrotate > %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
-touch -c -r %{buildroot}%{_datadir}/doc/%{name}/%{name}.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
-
-# Install the PHP module configuration file appropriate
-mkdir -p %{buildroot}%{_sysconfdir}/php.d/
-install -p -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/php.d/%{name}.ini
-
-# Create missing userscript directories for packaging them
-mkdir -p %{buildroot}%{_sysconfdir}/%{name}/userscripts/{create,delete}{user,group,company}.d/
+# Move the logrotate configuration file to its correct place
+rm -f %{buildroot}%{_sysconfdir}/logrotate.d/*
+for service in dagent gateway ical indexer licensed monitor server spooler; do
+    sed -e "s@SERVICE@$service@" %{SOURCE2} >> %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
+done
+touch -c -r %{SOURCE2} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 
 # Move the userscripts to their correct place and symlink them
 mkdir -p %{buildroot}%{_datadir}/%{name}/userscripts/
@@ -339,20 +393,57 @@ done
 
 # Create the data directory and install some files into
 mkdir -p %{buildroot}%{_datadir}/%{name}/
-install -p -m 755 installer/linux/db-{calc-storesize,convert-attachments-to-files} %{buildroot}%{_datadir}/%{name}/
-install -p -m 755 installer/linux/ssl-certificates.sh %{buildroot}%{_datadir}/%{name}/
+install -p -m 644 installer/linux/db-{calc-storesize,convert-attachments-to-files} %{buildroot}%{_datadir}/%{name}/
+install -p -m 644 installer/linux/ssl-certificates.sh %{buildroot}%{_datadir}/%{name}/
+%if %{with_ldap}
+install -p -m 644 installer/linux/{db-upgrade-objectsid-to-objectguid,ldap-switch-sendas}.pl %{buildroot}%{_datadir}/%{name}/
+install -p -m 644 installer/ldap/%{name}.schema %{buildroot}%{_datadir}/%{name}/
+%else
+rm -f %{buildroot}%{_sysconfdir}/%{name}/ldap.{active-directory,openldap,propmap}.cfg
+rm -f %{buildroot}%{_mandir}/man5/%{name}-ldap.cfg.5*
+%endif
 
 # Create the default log and lib directory for packaging
 mkdir -p %{buildroot}%{_localstatedir}/{log,lib}/%{name}/
 
 # Remove all libtool .la files to avoid packaging of them
-rm -f %{buildroot}%{_libdir}/{,php/extensions,%{name}}/*.la
+rm -f %{buildroot}{%{_libdir}/{,php/modules,php4,%{name}},%{perl_vendorarch}/auto/MAPI}/*.la
 
 # Remove files that are anyway in %doc or %{_datadir}/%{name}/
-rm -rf %{buildroot}%{_datadir}/doc/%{name}/
+rm -rf %{buildroot}%{_datadir}/doc/%{name}{,-indexer}/
 
-# nuke files that belongs to a licensed release
-rm -f %{buildroot}%{_mandir}/man1/zarafa-report.1*
+# Remove unwanted/unused files that shouldn't exist anyway...
+rm -f %{buildroot}%{_sysconfdir}/sysconfig/%{name}-indexer
+
+# Move Indexer/CLucene related files to its correct places
+%if %{with_clucene}
+mkdir -p %{buildroot}%{_sysconfdir}/%{name}/indexerscripts/
+mv -f %{buildroot}{%{_datadir},%{_sysconfdir}}/%{name}/indexerscripts/attachments_parser.db
+for helper in attachments_parser xmltotext.xslt zmktemp; do
+    ln -s ../../..%{_datadir}/%{name}/indexerscripts/$helper %{buildroot}%{_sysconfdir}/%{name}/indexerscripts/$helper
+done
+%else
+rm -f %{buildroot}{%{_sysconfdir}/{rc.d/init.d,sysconfig},%{_mandir}/man?}/%{name}-indexer*
+rm -rf %{buildroot}{%{_sysconfdir}/%{name}/indexer.cfg,%{_datadir}/%{name}/indexerscripts/}
+%endif
+
+# Move the webaccess configuration file to its correct place
+mv -f %{buildroot}%{_sysconfdir}/%{name}/webaccess{-ajax,}
+rm -f %{buildroot}%{_datadir}/%{name}-webaccess/config.php
+ln -sf ../../..%{_sysconfdir}/%{name}/webaccess/config.php %{buildroot}%{_datadir}/%{name}-webaccess/config.php
+
+# Install the apache configuration file for webaccess
+mkdir -p %{buildroot}%{_sysconfdir}/httpd/conf.d/
+install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/httpd/conf.d/%{name}-webaccess.conf
+
+# Move the webaccess plugins directory to its correct place
+rm -rf %{buildroot}{%{_datadir},%{_localstatedir}/lib}/%{name}-webaccess/plugins
+mkdir -p %{buildroot}%{_datadir}/%{name}-webaccess/plugins/
+
+# Remove unwanted language connectors and webaccess files
+rm -f %{buildroot}%{_datadir}/%{name}-webaccess/client/widgets/fckeditor/editor/dialog/fck_spellerpages/spellerpages/server-scripts/spellchecker.{cfm,pl}
+rm -f %{buildroot}%{_datadir}/%{name}-webaccess/{.htaccess,%{name}-webaccess.conf}
+rm -f %{buildroot}%{_libdir}/php/extensions/mapi.*a
 
 %find_lang %{name}
 
@@ -495,7 +586,7 @@ fi
 
 %files common
 %defattr(-,root,root,-)
-%doc installer/licenseagreement/AGPL-3 doc/performance-tuning.txt
+%doc installer/licenseagreement/AGPL-3
 %dir %{_sysconfdir}/%{name}/
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %dir %{_libdir}/%{name}/
@@ -510,6 +601,7 @@ fi
 %{_bindir}/%{name}-autorespond
 %{_bindir}/%{name}-dagent
 %config(noreplace) %attr(0640,%{name},%{name}) %{_sysconfdir}/%{name}/dagent.cfg
+%config(noreplace) %{_sysconfdir}/%{name}/autorespond
 %{_sysconfdir}/rc.d/init.d/%{name}-dagent
 %{_mandir}/man1/%{name}-dagent.1*
 %{_mandir}/man5/%{name}-dagent.cfg.5*
@@ -524,9 +616,12 @@ fi
 %{_libdir}/libcommon_ssl.a
 %{_libdir}/libcommon_util.a
 %{_libdir}/libfreebusy.a
+%{_libdir}/libzarafasync.a
 %{_includedir}/icalmapi/
 %{_includedir}/inetmapi/
 %{_includedir}/mapi4linux/
+%{_includedir}/libfreebusy/
+%{_includedir}/libzarafasync
 %{_includedir}/%{name}/
 %{_libdir}/pkgconfig/%{name}.pc
 
@@ -570,6 +665,7 @@ fi
 %{_bindir}/%{name}-server
 %config(noreplace) %attr(0640,%{name},%{name}) %{_sysconfdir}/%{name}/server.cfg
 %config(noreplace) %attr(0640,%{name},%{name}) %{_sysconfdir}/%{name}/unix.cfg
+%config(noreplace) %attr(0644,root,root) %{_sysconfdir}/sysconfig/zarafa
 %{_sysconfdir}/rc.d/init.d/%{name}-server
 %dir %{_sysconfdir}/%{name}/userscripts/
 %{_sysconfdir}/%{name}/userscripts/createuser
@@ -595,8 +691,12 @@ fi
 %{_mandir}/man5/%{name}-unix.cfg.5*
 %if %{with_ldap}
 %doc installer/ldap/%{name}.schema
+%{_datadir}/%{name}/%{name}.schema
+%{_datadir}/%{name}/db-upgrade-objectsid-to-objectguid.pl
+%{_datadir}/%{name}/ldap-switch-sendas.pl
 %config(noreplace) %attr(0640,%{name},%{name}) %{_sysconfdir}/%{name}/ldap.active-directory.cfg
 %config(noreplace) %attr(0640,%{name},%{name}) %{_sysconfdir}/%{name}/ldap.openldap.cfg
+%config(noreplace) %attr(0640,%{name},%{name}) %{_sysconfdir}/%{name}/ldap.propmap.cfg
 %{_libdir}/%{name}/ldapplugin.so
 %{_mandir}/man5/%{name}-ldap.cfg.5*
 %endif
@@ -617,6 +717,7 @@ fi
 %{_bindir}/%{name}-fsck
 %{_bindir}/%{name}-passwd
 %{_bindir}/%{name}-stats
+%{_bindir}/%{name}-cfgchecker
 %{_datadir}/%{name}/db-calc-storesize
 %{_datadir}/%{name}/db-convert-attachments-to-files
 %{_datadir}/%{name}/ssl-certificates.sh
@@ -624,6 +725,7 @@ fi
 %{_mandir}/man1/%{name}-fsck.1*
 %{_mandir}/man1/%{name}-passwd.1*
 %{_mandir}/man1/%{name}-stats.1*
+%{_mandir}/man1/%{name}-cfgchecker.1*
 
 %files -n %{libname}
 %defattr(-,root,root,-)
@@ -632,10 +734,11 @@ fi
 %{_libdir}/libinetmapi.so.*
 %{_libdir}/libmapi.so.*
 
-%files -n perl-libmapi
+%files -n perl-MAPI
 %defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
-%{_libdir}/libperlmapi.so
+%{perl_vendorarch}/MAPI.pm
+%{perl_vendorarch}/auto/MAPI/
 
 %files -n php-mapi
 %defattr(-,root,root,-)
@@ -643,4 +746,35 @@ fi
 %config(noreplace) %{_sysconfdir}/php.d/%{name}.ini
 %{_datadir}/php/mapi/
 %{_libdir}/php/extensions/mapi.so
+
+%if %{with_clucene}
+%files indexer
+%defattr(-,root,root,-)
+%doc installer/licenseagreement/AGPL-3
+%{_bindir}/%{name}-indexer
+%config(noreplace) %attr(0640,%{name},%{name}) %{_sysconfdir}/%{name}/indexer.cfg
+%{_sysconfdir}/rc.d/init.d/%{name}-indexer
+%dir %{_sysconfdir}/%{name}/indexerscripts/
+%config(noreplace) %{_sysconfdir}/%{name}/indexerscripts/attachments_parser.db
+%{_sysconfdir}/%{name}/indexerscripts/attachments_parser
+%{_sysconfdir}/%{name}/indexerscripts/xmltotext.xslt
+%{_sysconfdir}/%{name}/indexerscripts/zmktemp
+%dir %{_datadir}/%{name}/indexerscripts/
+%{_datadir}/%{name}/indexerscripts/attachments_parser
+%{_datadir}/%{name}/indexerscripts/xmltotext.xslt
+%{_datadir}/%{name}/indexerscripts/zmktemp
+%{_mandir}/man1/%{name}-indexer.1*
+%{_mandir}/man5/%{name}-indexer.cfg.5*
+%endif
+
+%files webaccess
+%defattr(-,root,root,-)
+%doc installer/licenseagreement/AGPL-3
+%config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}-webaccess.conf
+%dir %{_sysconfdir}/%{name}/
+%dir %{_sysconfdir}/%{name}/webaccess/
+%config(noreplace) %{_sysconfdir}/%{name}/webaccess/config.php
+%{_datadir}/%{name}-webaccess/
+%dir %{_localstatedir}/lib/%{name}-webaccess/
+%attr(-,apache,apache) %dir %{_localstatedir}/lib/%{name}-webaccess/tmp/
 
