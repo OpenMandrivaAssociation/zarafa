@@ -3,7 +3,7 @@
 %define develname %mklibname %{name} -d
 
 %define beta_or_rc 0
-%define actual_release 2
+%define actual_release 3
 %define svnrevision 20653
 %define with_clucene 1
 %define with_ldap 1
