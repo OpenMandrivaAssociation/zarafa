@@ -3,7 +3,7 @@
 %define develname %mklibname %{name} -d
 
 %define beta_or_rc 0
-%define actual_release 1
+%define actual_release 2
 %define svnrevision 20653
 %define with_clucene 1
 %define with_ldap 1
@@ -285,8 +285,7 @@ Summary:	Zarafa Webaccess featuring a 'Look & Feel' similar to Outlook
 Group:		Development/PHP
 Requires:	apache-mod_php >= 5.2
 Requires:	php-mapi >= %{version}-%{release}
-# the current bs can't handle this.
-#BuildArch:	noarch
+BuildArch:	noarch
 
 %description	webaccess
 Zarafa Webaccess features the familiar Outlook 'Look & Feel' interface
