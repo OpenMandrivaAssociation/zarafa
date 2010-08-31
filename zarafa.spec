@@ -13,7 +13,7 @@
 
 Summary:	Zarafa Outlook Sharing and Open Source Collaboration
 Name:		zarafa
-Version:	6.40.1
+Version:	6.40.2
 %if %{beta_or_rc}
 Release:	%mkrel 0.%{actual_release}.svn%{svnrevision}
 %else
@@ -33,8 +33,6 @@ Source1:	%{name}.ini
 Source2:	%{name}.logrotate
 Source3:	%{name}-webaccess.conf
 Patch0:		zarafa-6.40.0-package.patch
-# Patch 1, 2, 3, 4 and 5 were sent to upstream
-Patch1:		zarafa-6.40.0-undefined-symbol.patch
 # mandriva patches
 Patch100:	zarafa-6.30.10-linkage_fix.diff
 BuildRequires:	bison
@@ -299,10 +297,9 @@ technology to give a more interactive feeling to the users.
 
 %setup -q
 %patch0 -p1 -b .package
-%patch1 -p1 -b .undefined-symbol
 
 # mandriva patches
-%patch100 -p0
+%patch100 -p1
 
 %build
 # Needed to get rid of rpath
