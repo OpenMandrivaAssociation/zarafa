@@ -2,9 +2,9 @@
 %define	libname %mklibname %{name} %{major}
 %define develname %mklibname %{name} -d
 
-%define beta_or_rc 0
-%define actual_release 2
-%define svnrevision 20653
+%define beta_or_rc 1
+%define actual_release 1
+%define svnrevision 24121
 %define with_clucene 1
 %define with_ldap 1
 %define with_xmlto 1
@@ -13,9 +13,9 @@
 
 Summary:	Zarafa Outlook Sharing and Open Source Collaboration
 Name:		zarafa
-Version:	6.40.3
+Version:	6.40.4
 %if %{beta_or_rc}
-Release:	%mkrel 0.%{actual_release}.svn%{svnrevision}
+Release:	%mkrel 0.%{actual_release}.svn%{svnrevision}.0
 %else
 Release:	%mkrel %{actual_release}
 %endif
@@ -28,7 +28,8 @@ License:	AGPLv3 with exceptions
 Group:		System/Servers
 URL:		http://www.zarafa.com/
 # http://www.zarafa.com/download-community -> "Zarafa Source Package"
-Source0:	%{name}-%{version}.tar.gz
+#Source0:	%{name}-%{version}.tar.gz
+Source0:	http://download.zarafa.com/community/final/6.40/6.40.4-24121/zcp-source-6.40.4-24121.tgz
 Source1:	%{name}.ini
 Source2:	%{name}.logrotate
 Source3:	%{name}-webaccess.conf
@@ -297,7 +298,11 @@ technology to give a more interactive feeling to the users.
 
 %prep
 
-%setup -q
+%setup -q -n zcp-source-6.40.4-24121
+
+# fixup
+rm -rf lib*; mv src/* .; rm -rf src
+
 %patch0 -p1 -b .package
 
 # mandriva patches
@@ -335,6 +340,7 @@ make \
     datarootdir=%{_datadir} \
     DESTDIR=%{buildroot} \
     INSTALL='install -p' \
+    BUILT_SOURCES='' \
     install \
     install-ajax-webaccess
 
@@ -437,6 +443,11 @@ mkdir -p %{buildroot}%{_datadir}/%{name}-webaccess/plugins/
 rm -f %{buildroot}%{_datadir}/%{name}-webaccess/client/widgets/fckeditor/editor/dialog/fck_spellerpages/spellerpages/server-scripts/spellchecker.{cfm,pl}
 rm -f %{buildroot}%{_datadir}/%{name}-webaccess/{.htaccess,%{name}-webaccess.conf}
 rm -f %{buildroot}%{_libdir}/php/extensions/mapi.*a
+
+# bork
+install -m0644 doc/zarafa.1 %{buildroot}%{_mandir}/man1/
+install -m0644 installer/linux/ldap.active-directory.cfg %{buildroot}%{_sysconfdir}/%{name}/
+install -m0644 installer/linux/ldap.openldap.cfg %{buildroot}%{_sysconfdir}/%{name}/
 
 %find_lang %{name}
 
