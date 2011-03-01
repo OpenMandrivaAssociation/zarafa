@@ -1,10 +1,12 @@
+%define _disable_ld_as_needed 1
+%define _disable_ld_no_undefined 1
 %define	major 0
 %define	libname %mklibname %{name} %{major}
 %define develname %mklibname %{name} -d
 
 %define beta_or_rc 1
 %define actual_release 1
-%define svnrevision 24121
+%define svnrevision 24860
 %define with_clucene 1
 %define with_ldap 1
 %define with_xmlto 1
@@ -13,7 +15,7 @@
 
 Summary:	Zarafa Outlook Sharing and Open Source Collaboration
 Name:		zarafa
-Version:	6.40.4
+Version:	6.40.5
 %if %{beta_or_rc}
 Release:	%mkrel 0.%{actual_release}.svn%{svnrevision}.0
 %else
@@ -29,13 +31,16 @@ Group:		System/Servers
 URL:		http://www.zarafa.com/
 # http://www.zarafa.com/download-community -> "Zarafa Source Package"
 #Source0:	%{name}-%{version}.tar.gz
-Source0:	http://download.zarafa.com/community/final/6.40/6.40.4-24121/zcp-source-6.40.4-24121.tgz
+Source0:	http://download.zarafa.com/community/final/6.40/6.40.5-%{svnrevision}/zcp-source-6.40.5-%{svnrevision}.tgz
 Source1:	%{name}.ini
 Source2:	%{name}.logrotate
 Source3:	%{name}-webaccess.conf
 Patch0:		zarafa-6.40.0-package.patch
 # mandriva patches
 Patch100:	zarafa-6.30.10-linkage_fix.diff
+Patch101:	zarafa-6.40.5-pthread.patch
+Patch102:	zarafa-6.40.5-missingdef.patch
+Patch103:	zarafa-6.40.5-uuid.patch
 BuildRequires:	bison
 BuildRequires:	byacc
 BuildRequires:	curl-devel
@@ -51,6 +56,8 @@ BuildRequires:	pam-devel
 BuildRequires:	perl
 BuildRequires:	perl-devel
 BuildRequires:	php-devel >= 3:5.2.0
+BuildRequires:	swig
+BuildRequires:	python-devel
 %if %{with_clucene}
 BuildRequires:	clucene-devel >= 0.9.21b
 %endif
@@ -235,15 +242,13 @@ Requires(postun):   /sbin/ldconfig
 %description -n %{libname}
 MAPI libraries by Zarafa.
 
-%package -n	perl-MAPI
-Summary:	Perl Mapi extension libraries by Zarafa
-Group:		Development/Perl
-Requires:	perl
-Conflicts:	%{_lib}zarafa-devel < 6.30.12-2
-Obsoletes:	perl-libmapi
+%package -n	python-MAPI
+Summary:	Python Mapi extension libraries by Zarafa
+Group:		Development/Python
+Requires:	python
 
-%description -n	perl-MAPI
-Perl MAPI extension libraries by Zarafa.
+%description -n	python-MAPI
+Python MAPI extension libraries by Zarafa.
 
 %package -n	php-mapi
 Summary:	A PHP Mapi client by Zarafa
@@ -298,7 +303,7 @@ technology to give a more interactive feeling to the users.
 
 %prep
 
-%setup -q -n zcp-source-6.40.4-24121
+%setup -q -n zcp-source-%{version}-%{svnrevision}
 
 # fixup
 rm -rf lib*; mv src/* .; rm -rf src
@@ -306,12 +311,15 @@ rm -rf lib*; mv src/* .; rm -rf src
 %patch0 -p1 -b .package
 
 # mandriva patches
-%patch100 -p1
+%patch100 -p1 -b .linkage
+%patch101 -p1 -b .pthread
+%patch102 -p1 -b .missingdef
+%patch103 -p1 -b .uuid
 
 %build
 # Needed to get rid of rpath
-libtoolize --force
-autoreconf --force --install
+#libtoolize --force
+#autoreconf --force --install
 
 CFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -g -ggdb"
 export CFLAGS
@@ -578,6 +586,8 @@ fi
 %files
 %defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
+%exclude %{_mandir}/man1/%{name}-archiver.1*
+%exclude %{_mandir}/man5/%{name}-archiver.cfg.5*
 
 %files caldav
 %defattr(-,root,root,-)
@@ -738,12 +748,6 @@ fi
 %{_libdir}/libinetmapi.so.*
 %{_libdir}/libmapi.so.*
 
-%files -n perl-MAPI
-%defattr(-,root,root,-)
-%doc installer/licenseagreement/AGPL-3
-%{perl_vendorarch}/MAPI.pm
-%{perl_vendorarch}/auto/MAPI/
-
 %files -n php-mapi
 %defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
@@ -782,3 +786,11 @@ fi
 %dir %{_localstatedir}/lib/%{name}-webaccess/
 %attr(-,apache,apache) %dir %{_localstatedir}/lib/%{name}-webaccess/tmp/
 
+%files -n python-MAPI
+%defattr(-,root,root,-)
+%doc installer/licenseagreement/AGPL-3
+%{py_platsitedir}/*MAPI*
+%{py_platsitedir}/icalmapi*
+%{py_platsitedir}/inetmapi*
+%{py_platsitedir}/_icalmapi*
+%{py_platsitedir}/_inetmapi*
