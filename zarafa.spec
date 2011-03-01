@@ -457,6 +457,10 @@ install -m0644 doc/zarafa.1 %{buildroot}%{_mandir}/man1/
 install -m0644 installer/linux/ldap.active-directory.cfg %{buildroot}%{_sysconfdir}/%{name}/
 install -m0644 installer/linux/ldap.openldap.cfg %{buildroot}%{_sysconfdir}/%{name}/
 
+# remove archiver files
+rm -f %{buildroot}%{_mandir}/man1/%{name}-archiver.1*
+rm -f %{buildroot}%{_mandir}/man5/%{name}-archiver.cfg.5*
+
 %find_lang %{name}
 
 %clean
@@ -586,8 +590,6 @@ fi
 %files
 %defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
-%exclude %{_mandir}/man1/%{name}-archiver.1*
-%exclude %{_mandir}/man5/%{name}-archiver.cfg.5*
 
 %files caldav
 %defattr(-,root,root,-)
