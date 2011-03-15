@@ -47,7 +47,12 @@ BuildRequires:	curl-devel
 BuildRequires:	flex
 BuildRequires:	gettext
 BuildRequires:	libical-devel >= 0.42
+%if %mdkversion >= 201000
 BuildRequires:	libuuid-devel
+%endif
+%if %mdkversion == 200900
+BuildRequires:	e2fsprogs-devel
+%endif
 BuildRequires:	libvmime07-devel
 BuildRequires:	libxml2-devel
 BuildRequires:	mysql-devel >= 4.1
@@ -59,7 +64,7 @@ BuildRequires:	php-devel >= 3:5.2.0
 BuildRequires:	swig
 BuildRequires:	python-devel
 %if %{with_clucene}
-BuildRequires:	clucene-devel >= 0.9.21b
+BuildRequires:	clucene-devel >= 0.9.20
 %endif
 %if %{with_ldap}
 BuildRequires:	openldap-devel
@@ -320,6 +325,12 @@ rm -rf lib*; mv src/* .; rm -rf src
 # Needed to get rid of rpath
 #libtoolize --force
 #autoreconf --force --install
+
+# barfs on mes5
+%if %mdkversion == 200900
+export WANT_AUTOCONF_2_5="1"
+libtoolize --copy --force; aclocal-1.9 -I autoconf; autoheader; automake-1.9 --copy --add-missing; autoconf 
+%endif
 
 CFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -g -ggdb"
 export CFLAGS
