@@ -6,7 +6,8 @@
 
 %define beta_or_rc 1
 %define actual_release 1
-%define svnrevision 24860
+%define svnrevision 25584
+
 %define with_clucene 1
 %define with_ldap 1
 %define with_xmlto 1
@@ -15,7 +16,7 @@
 
 Summary:	Zarafa Outlook Sharing and Open Source Collaboration
 Name:		zarafa
-Version:	6.40.5
+Version:	6.40.6
 %if %{beta_or_rc}
 Release:	%mkrel 0.%{actual_release}.svn%{svnrevision}.0
 %else
@@ -31,7 +32,7 @@ Group:		System/Servers
 URL:		http://www.zarafa.com/
 # http://www.zarafa.com/download-community -> "Zarafa Source Package"
 #Source0:	%{name}-%{version}.tar.gz
-Source0:	http://download.zarafa.com/community/final/6.40/6.40.5-%{svnrevision}/zcp-source-6.40.5-%{svnrevision}.tgz
+Source0:	http://download.zarafa.com/community/final/6.40/6.40.6-%{svnrevision}/sourcecode/zcp-%{version}.tar.gz
 Source1:	%{name}.ini
 Source2:	%{name}.logrotate
 Source3:	%{name}-webaccess.conf
@@ -39,7 +40,6 @@ Patch0:		zarafa-6.40.0-package.patch
 # mandriva patches
 Patch100:	zarafa-6.30.10-linkage_fix.diff
 Patch101:	zarafa-6.40.5-pthread.patch
-Patch102:	zarafa-6.40.5-missingdef.patch
 Patch103:	zarafa-6.40.5-uuid.patch
 BuildRequires:	bison
 BuildRequires:	byacc
@@ -63,6 +63,7 @@ BuildRequires:	perl-devel
 BuildRequires:	php-devel >= 3:5.2.0
 BuildRequires:	swig
 BuildRequires:	python-devel
+BuildRequires:	boost-devel
 %if %{with_clucene}
 BuildRequires:	clucene-devel >= 0.9.20
 %endif
@@ -306,31 +307,49 @@ web browser. And opening your colleagues calendar or sending a meeting
 request is only a piece of cake. The Zarafa Webaccess is using the ajax
 technology to give a more interactive feeling to the users.
 
+%package	archiver
+Summary:	Manages zarafa archives and performs the archive operation
+Group:		System/Servers
+Requires:	zarafa-client >= %{version}-%{release}
+Requires:	zarafa-common >= %{version}-%{release}
+Requires:	zarafa-utils >= %{version}-%{release}
+
+%description	archiver
+This tool is used to attach or detach archives to a users store. An archive is
+defined as a special non-active store or a folder inside such a store.
+
+On top of managing archives, this tool is used to perform the actual archive
+operation. Using the -u option, the archiver can be instructed to archive a
+single store or all stores.
+
+%package	msr
+Summary:	Relocates mailboxes from one node to another
+Group:		System/Servers
+Requires:	zarafa-client >= %{version}-%{release}
+Requires:	zarafa-common >= %{version}-%{release}
+Requires:	zarafa-utils >= %{version}-%{release}
+Requires:	python-MAPI >= %{version}-%{release}
+Requires:	python-threadpool
+
+%description	msr
+In order to move mailboxes between multi-server nodes, the mailbox storage
+relocator is available. The zarafa-msr tool should be used to relocate
+mailboxes to other multi-server nodes.
+
 %prep
 
-%setup -q -n zcp-source-%{version}-%{svnrevision}
-
-# fixup
-rm -rf lib*; mv src/* .; rm -rf src
-
+%setup -q -n %{name}-%{version}
 %patch0 -p1 -b .package
 
 # mandriva patches
 %patch100 -p1 -b .linkage
 %patch101 -p1 -b .pthread
-%patch102 -p1 -b .missingdef
 %patch103 -p1 -b .uuid
 
 %build
 # Needed to get rid of rpath
-#libtoolize --force
-#autoreconf --force --install
-
-# barfs on mes5
-%if %mdkversion == 200900
-export WANT_AUTOCONF_2_5="1"
-libtoolize --copy --force; aclocal-1.9 -I autoconf; autoheader; automake-1.9 --copy --add-missing; autoconf 
-%endif
+libtoolize --copy --force
+autoreconf --force --install
 
 CFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -g -ggdb"
 export CFLAGS
@@ -467,10 +486,7 @@ rm -f %{buildroot}%{_libdir}/php/extensions/mapi.*a
 install -m0644 doc/zarafa.1 %{buildroot}%{_mandir}/man1/
 install -m0644 installer/linux/ldap.active-directory.cfg %{buildroot}%{_sysconfdir}/%{name}/
 install -m0644 installer/linux/ldap.openldap.cfg %{buildroot}%{_sysconfdir}/%{name}/
-
-# remove archiver files
-rm -f %{buildroot}%{_mandir}/man1/%{name}-archiver.1*
-rm -f %{buildroot}%{_mandir}/man5/%{name}-archiver.cfg.5*
+install -m0644 installer/linux/archiver.cfg %{buildroot}%{_sysconfdir}/%{name}/
 
 %find_lang %{name}
 
@@ -636,6 +652,7 @@ fi
 %files -n %{develname}
 %defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
+%{_libdir}/libarchiver.so
 %{_libdir}/libicalmapi.so
 %{_libdir}/libinetmapi.so
 %{_libdir}/libmapi.so
@@ -741,22 +758,23 @@ fi
 %defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
 %{_bindir}/%{name}-admin
+%{_bindir}/%{name}-cfgchecker
 %{_bindir}/%{name}-fsck
 %{_bindir}/%{name}-passwd
 %{_bindir}/%{name}-stats
-%{_bindir}/%{name}-cfgchecker
 %{_datadir}/%{name}/db-calc-storesize
 %{_datadir}/%{name}/db-convert-attachments-to-files
 %{_datadir}/%{name}/ssl-certificates.sh
 %{_mandir}/man1/%{name}-admin.1*
+%{_mandir}/man1/%{name}-cfgchecker.1*
 %{_mandir}/man1/%{name}-fsck.1*
 %{_mandir}/man1/%{name}-passwd.1*
 %{_mandir}/man1/%{name}-stats.1*
-%{_mandir}/man1/%{name}-cfgchecker.1*
 
 %files -n %{libname}
 %defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
+%{_libdir}/libarchiver.so.*
 %{_libdir}/libicalmapi.so.*
 %{_libdir}/libinetmapi.so.*
 %{_libdir}/libmapi.so.*
@@ -807,3 +825,18 @@ fi
 %{py_platsitedir}/inetmapi*
 %{py_platsitedir}/_icalmapi*
 %{py_platsitedir}/_inetmapi*
+
+%files archiver
+%defattr(-,root,root,-)
+%doc installer/licenseagreement/AGPL-3
+%config(noreplace) %attr(0640,%{name},%{name}) %{_sysconfdir}/%{name}/archiver.cfg
+%{_bindir}/%{name}-archiver
+%{_mandir}/man1/%{name}-archiver.1*
+%{_mandir}/man5/%{name}-archiver.cfg.5*
+
+%files msr
+%defattr(-,root,root,-)
+%doc installer/licenseagreement/AGPL-3
+%{_bindir}/%{name}-msr
+%{_mandir}/man1/%{name}-msr.1*
+%{_mandir}/man5/%{name}-msr.cfg.5*
