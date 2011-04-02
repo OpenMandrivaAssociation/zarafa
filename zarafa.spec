@@ -6,17 +6,18 @@
 
 %define beta_or_rc 1
 %define actual_release 1
-%define svnrevision 25584
+%define svnrevision 26119
 
 %define with_clucene 1
 %define with_ldap 1
 %define with_xmlto 1
 
-%define _requires_exceptions pear(
+%define _requires_exceptions pear(debug.php)\\|pear(mapi/
+%define _provides_exceptions pear(debug.php)\\|pear(mapi/
 
 Summary:	Zarafa Outlook Sharing and Open Source Collaboration
 Name:		zarafa
-Version:	6.40.6
+Version:	6.40.7
 %if %{beta_or_rc}
 Release:	%mkrel 0.%{actual_release}.svn%{svnrevision}.1
 %else
@@ -32,7 +33,7 @@ Group:		System/Servers
 URL:		http://www.zarafa.com/
 # http://www.zarafa.com/download-community -> "Zarafa Source Package"
 #Source0:	%{name}-%{version}.tar.gz
-Source0:	http://download.zarafa.com/community/final/6.40/6.40.6-%{svnrevision}/sourcecode/zcp-%{version}.tar.gz
+Source0:	http://download.zarafa.com/community/final/6.40/6.40.7-%{svnrevision}/sourcecode/zcp-%{version}.tar.gz
 Source1:	%{name}.ini
 Source2:	%{name}.logrotate
 Source3:	%{name}-webaccess.conf
@@ -41,6 +42,7 @@ Patch0:		zarafa-6.40.0-package.patch
 Patch100:	zarafa-6.30.10-linkage_fix.diff
 Patch101:	zarafa-6.40.5-pthread.patch
 Patch103:	zarafa-6.40.5-uuid.patch
+Patch104:	zarafa-6.40.7-system_pear.diff
 BuildRequires:	bison
 BuildRequires:	byacc
 BuildRequires:	curl-devel
@@ -298,6 +300,8 @@ Requires:	php-mapi >= %{version}-%{release}
 %if %mdkversion >= 201010
 BuildArch:	noarch
 %endif
+Requires:	php-pear php-pear-XML_Serializer php-pear-Services_JSON php-pear-XML_Parser
+Requires:	php-iconv
 
 %description	webaccess
 Zarafa Webaccess features the familiar Outlook 'Look & Feel' interface
@@ -345,6 +349,7 @@ mailboxes to other multi-server nodes.
 %patch100 -p1 -b .linkage
 %patch101 -p1 -b .pthread
 %patch103 -p1 -b .uuid
+%patch104 -p1
 
 %build
 # Needed to get rid of rpath
@@ -415,10 +420,7 @@ done
 
 # Move the logrotate configuration file to its correct place
 rm -f %{buildroot}%{_sysconfdir}/logrotate.d/*
-for service in dagent gateway ical indexer licensed monitor server spooler; do
-    sed -e "s@SERVICE@$service@" %{SOURCE2} >> %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
-done
-touch -c -r %{SOURCE2} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
+install -m644 %{SOURCE2} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 
 # Move the userscripts to their correct place and symlink them
 mkdir -p %{buildroot}%{_datadir}/%{name}/userscripts/
@@ -430,11 +432,12 @@ done
 
 # Create the data directory and install some files into
 mkdir -p %{buildroot}%{_datadir}/%{name}/
-install -p -m 644 installer/linux/db-{calc-storesize,convert-attachments-to-files} %{buildroot}%{_datadir}/%{name}/
-install -p -m 644 installer/linux/ssl-certificates.sh %{buildroot}%{_datadir}/%{name}/
+install -m0755 installer/linux/db-{calc-storesize,convert-attachments-to-files} %{buildroot}%{_datadir}/%{name}/
+install -m0755 installer/linux/ssl-certificates.sh %{buildroot}%{_datadir}/%{name}/
+install -m0755 installer/linux/audit-parse.pl %{buildroot}%{_datadir}/%{name}/
 %if %{with_ldap}
-install -p -m 644 installer/linux/{db-upgrade-objectsid-to-objectguid,ldap-switch-sendas}.pl %{buildroot}%{_datadir}/%{name}/
-install -p -m 644 installer/ldap/%{name}.schema %{buildroot}%{_datadir}/%{name}/
+install -m0755 installer/linux/{db-upgrade-objectsid-to-objectguid,ldap-switch-sendas}.pl %{buildroot}%{_datadir}/%{name}/
+install -m0644 installer/ldap/%{name}.schema %{buildroot}%{_datadir}/%{name}/
 %else
 rm -f %{buildroot}%{_sysconfdir}/%{name}/ldap.{active-directory,openldap,propmap}.cfg
 rm -f %{buildroot}%{_mandir}/man5/%{name}-ldap.cfg.5*
@@ -470,8 +473,8 @@ rm -f %{buildroot}%{_datadir}/%{name}-webaccess/config.php
 ln -sf ../../..%{_sysconfdir}/%{name}/webaccess/config.php %{buildroot}%{_datadir}/%{name}-webaccess/config.php
 
 # Install the apache configuration file for webaccess
-mkdir -p %{buildroot}%{_sysconfdir}/httpd/conf.d/
-install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/httpd/conf.d/%{name}-webaccess.conf
+mkdir -p %{buildroot}%{_sysconfdir}/httpd/conf/webapps.d
+install -m0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/httpd/conf/webapps.d/%{name}-webaccess.conf
 
 # Move the webaccess plugins directory to its correct place
 rm -rf %{buildroot}{%{_datadir},%{_localstatedir}/lib}/%{name}-webaccess/plugins
@@ -487,6 +490,24 @@ install -m0644 doc/zarafa.1 %{buildroot}%{_mandir}/man1/
 install -m0644 installer/linux/ldap.active-directory.cfg %{buildroot}%{_sysconfdir}/%{name}/
 install -m0644 installer/linux/ldap.openldap.cfg %{buildroot}%{_sysconfdir}/%{name}/
 install -m0644 installer/linux/archiver.cfg %{buildroot}%{_sysconfdir}/%{name}/
+
+# don't bundle PEAR
+
+# php-pear
+rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/PEAR.php
+rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Util.php
+
+# php-pear-XML_Serializer
+rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Serializer.php
+rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Unserializer.php
+
+# php-pear-Services_JSON
+rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/JSON.php
+
+# php-pear-XML_Parser
+rm -rf %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Parser
+rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Parser.php
+
 
 %find_lang %{name}
 
@@ -744,6 +765,7 @@ fi
 %{_libdir}/%{name}/ldapplugin.so
 %{_mandir}/man5/%{name}-ldap.cfg.5*
 %endif
+%{_datadir}/%{name}/audit-parse.pl
 
 %files spooler
 %defattr(-,root,root,-)
@@ -809,7 +831,7 @@ fi
 %files webaccess
 %defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
-%config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}-webaccess.conf
+%config(noreplace) %{_sysconfdir}/httpd/conf/webapps.d/%{name}-webaccess.conf
 %dir %{_sysconfdir}/%{name}/
 %dir %{_sysconfdir}/%{name}/webaccess/
 %config(noreplace) %{_sysconfdir}/%{name}/webaccess/config.php
