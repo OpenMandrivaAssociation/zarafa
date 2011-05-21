@@ -6,7 +6,7 @@
 
 %define beta_or_rc 1
 %define actual_release 1
-%define svnrevision 26119
+%define svnrevision 27223
 
 %define with_clucene 1
 %define with_ldap 1
@@ -17,7 +17,7 @@
 
 Summary:	Zarafa Outlook Sharing and Open Source Collaboration
 Name:		zarafa
-Version:	6.40.7
+Version:	6.40.8
 %if %{beta_or_rc}
 Release:	%mkrel 0.%{actual_release}.svn%{svnrevision}.1
 %else
@@ -33,7 +33,8 @@ Group:		System/Servers
 URL:		http://www.zarafa.com/
 # http://www.zarafa.com/download-community -> "Zarafa Source Package"
 #Source0:	%{name}-%{version}.tar.gz
-Source0:	http://download.zarafa.com/community/final/6.40/6.40.7-%{svnrevision}/sourcecode/zcp-%{version}.tar.gz
+# http://download.zarafa.com/community/final/6.40/ <- go here instead...
+Source0:	http://download.zarafa.com/community/final/6.40/6.40.8-%{svnrevision}/sourcecode/zcp-%{version}.tar.gz
 Source1:	%{name}.ini
 Source2:	%{name}.logrotate
 Source3:	%{name}-webaccess.conf
