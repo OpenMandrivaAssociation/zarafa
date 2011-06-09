@@ -6,7 +6,7 @@
 
 %define beta_or_rc 1
 %define actual_release 1
-%define svnrevision 27223
+%define svnrevision 27553
 
 %define with_clucene 1
 %define with_ldap 1
@@ -17,7 +17,7 @@
 
 Summary:	Zarafa Outlook Sharing and Open Source Collaboration
 Name:		zarafa
-Version:	6.40.8
+Version:	6.40.9
 %if %{beta_or_rc}
 Release:	%mkrel 0.%{actual_release}.svn%{svnrevision}.1
 %else
