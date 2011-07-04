@@ -641,7 +641,6 @@ fi
 %{_includedir}/libzarafasync
 %{_includedir}/%{name}/
 %{_libdir}/pkgconfig/%{name}.pc
-%{_mandir}/man1/zarafa-archiver.1.lzma
 %{_mandir}/man5/zarafa-archiver.cfg.5.lzma
 %{_mandir}/man1/zarafa-msr.1.lzma
 %{_mandir}/man5/zarafa-msr.cfg.5.lzma
