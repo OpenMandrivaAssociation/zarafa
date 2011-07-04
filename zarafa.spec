@@ -6,7 +6,7 @@
 
 %define beta_or_rc 1
 %define actual_release 1
-%define svnrevision 27553
+%define svnrevision 27791
 
 %define with_clucene 1
 %define with_ldap 1
@@ -14,10 +14,11 @@
 
 %define _requires_exceptions pear(debug.php)\\|pear(mapi/
 %define _provides_exceptions pear(debug.php)\\|pear(mapi/
+%define version 7.0.0
 
 Summary:	Zarafa Outlook Sharing and Open Source Collaboration
 Name:		zarafa
-Version:	6.40.9
+Version:	%{version}
 %if %{beta_or_rc}
 Release:	%mkrel 0.%{actual_release}.svn%{svnrevision}.1
 %else
@@ -32,18 +33,11 @@ License:	AGPLv3 with exceptions
 Group:		System/Servers
 URL:		http://www.zarafa.com/
 # http://www.zarafa.com/download-community -> "Zarafa Source Package"
-#Source0:	%{name}-%{version}.tar.gz
-# http://download.zarafa.com/community/final/6.40/ <- go here instead...
-Source0:	http://download.zarafa.com/community/final/6.40/6.40.8-%{svnrevision}/sourcecode/zcp-%{version}.tar.gz
+Source0:	http://download.zarafa.com/community/final/7.0/%{version}-%{svnrevision}/sourcecode/zcp-%{version}.tar.gz
 Source1:	%{name}.ini
 Source2:	%{name}.logrotate
 Source3:	%{name}-webaccess.conf
-Patch0:		zarafa-6.40.0-package.patch
-# mandriva patches
-Patch100:	zarafa-6.30.10-linkage_fix.diff
-Patch101:	zarafa-6.40.5-pthread.patch
-Patch103:	zarafa-6.40.5-uuid.patch
-Patch104:	zarafa-6.40.7-system_pear.diff
+Patch0:		zarafa-7.0.0-package.patch
 BuildRequires:	bison
 BuildRequires:	byacc
 BuildRequires:	curl-devel
@@ -56,7 +50,7 @@ BuildRequires:	libuuid-devel
 %if %mdkversion == 200900
 BuildRequires:	e2fsprogs-devel
 %endif
-BuildRequires:	libvmime07-devel
+BuildRequires:	libvmime-devel >= 0.9.0
 BuildRequires:	libxml2-devel
 BuildRequires:	mysql-devel >= 4.1
 BuildRequires:	ncurses-devel
@@ -312,51 +306,11 @@ web browser. And opening your colleagues calendar or sending a meeting
 request is only a piece of cake. The Zarafa Webaccess is using the ajax
 technology to give a more interactive feeling to the users.
 
-%package	archiver
-Summary:	Manages zarafa archives and performs the archive operation
-Group:		System/Servers
-Requires:	zarafa-client >= %{version}-%{release}
-Requires:	zarafa-common >= %{version}-%{release}
-Requires:	zarafa-utils >= %{version}-%{release}
-
-%description	archiver
-This tool is used to attach or detach archives to a users store. An archive is
-defined as a special non-active store or a folder inside such a store.
-
-On top of managing archives, this tool is used to perform the actual archive
-operation. Using the -u option, the archiver can be instructed to archive a
-single store or all stores.
-
-%package	msr
-Summary:	Relocates mailboxes from one node to another
-Group:		System/Servers
-Requires:	zarafa-client >= %{version}-%{release}
-Requires:	zarafa-common >= %{version}-%{release}
-Requires:	zarafa-utils >= %{version}-%{release}
-Requires:	python-MAPI >= %{version}-%{release}
-Requires:	python-threadpool
-
-%description	msr
-In order to move mailboxes between multi-server nodes, the mailbox storage
-relocator is available. The zarafa-msr tool should be used to relocate
-mailboxes to other multi-server nodes.
-
 %prep
-
 %setup -q -n %{name}-%{version}
 %patch0 -p1 -b .package
 
-# mandriva patches
-%patch100 -p1 -b .linkage
-%patch101 -p1 -b .pthread
-%patch103 -p1 -b .uuid
-%patch104 -p1
-
 %build
-# Needed to get rid of rpath
-libtoolize --copy --force
-autoreconf --force --install
-
 CFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -g -ggdb"
 export CFLAGS
 %configure2_5x \
@@ -372,7 +326,9 @@ export CFLAGS
     --enable-release \
     --disable-static \
     --disable-testtools \
-    --enable-perl
+    --enable-unicode \
+    --enable-python \
+    --disable-perl
 
 %make
 
@@ -490,7 +446,6 @@ rm -f %{buildroot}%{_libdir}/php/extensions/mapi.*a
 install -m0644 doc/zarafa.1 %{buildroot}%{_mandir}/man1/
 install -m0644 installer/linux/ldap.active-directory.cfg %{buildroot}%{_sysconfdir}/%{name}/
 install -m0644 installer/linux/ldap.openldap.cfg %{buildroot}%{_sysconfdir}/%{name}/
-install -m0644 installer/linux/archiver.cfg %{buildroot}%{_sysconfdir}/%{name}/
 
 # don't bundle PEAR
 
@@ -508,7 +463,6 @@ rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/JSON.php
 # php-pear-XML_Parser
 rm -rf %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Parser
 rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Parser.php
-
 
 %find_lang %{name}
 
@@ -648,6 +602,7 @@ fi
 %defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
 %{_libdir}/libzarafaclient.so
+%{_mandir}/man1/za-aclsync.1.*
 
 %files common
 %defattr(-,root,root,-)
@@ -690,6 +645,11 @@ fi
 %{_includedir}/libzarafasync
 %{_includedir}/%{name}/
 %{_libdir}/pkgconfig/%{name}.pc
+%{_mandir}/man1/zarafa-archiver.1.lzma
+%{_mandir}/man5/zarafa-archiver.cfg.5.lzma
+%{_mandir}/man1/zarafa-msr.1.lzma
+%{_mandir}/man5/zarafa-msr.cfg.5.lzma
+
 
 %files gateway
 %defattr(-,root,root,-)
@@ -781,7 +741,6 @@ fi
 %defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
 %{_bindir}/%{name}-admin
-%{_bindir}/%{name}-cfgchecker
 %{_bindir}/%{name}-fsck
 %{_bindir}/%{name}-passwd
 %{_bindir}/%{name}-stats
@@ -789,7 +748,6 @@ fi
 %{_datadir}/%{name}/db-convert-attachments-to-files
 %{_datadir}/%{name}/ssl-certificates.sh
 %{_mandir}/man1/%{name}-admin.1*
-%{_mandir}/man1/%{name}-cfgchecker.1*
 %{_mandir}/man1/%{name}-fsck.1*
 %{_mandir}/man1/%{name}-passwd.1*
 %{_mandir}/man1/%{name}-stats.1*
@@ -848,18 +806,5 @@ fi
 %{py_platsitedir}/inetmapi*
 %{py_platsitedir}/_icalmapi*
 %{py_platsitedir}/_inetmapi*
-
-%files archiver
-%defattr(-,root,root,-)
-%doc installer/licenseagreement/AGPL-3
-%config(noreplace) %attr(0640,%{name},%{name}) %{_sysconfdir}/%{name}/archiver.cfg
-%{_bindir}/%{name}-archiver
-%{_mandir}/man1/%{name}-archiver.1*
-%{_mandir}/man5/%{name}-archiver.cfg.5*
-
-%files msr
-%defattr(-,root,root,-)
-%doc installer/licenseagreement/AGPL-3
-%{_bindir}/%{name}-msr
-%{_mandir}/man1/%{name}-msr.1*
-%{_mandir}/man5/%{name}-msr.cfg.5*
+%{py_platsitedir}/_licenseclient*
+%{py_platsitedir}/licenseclient.py
