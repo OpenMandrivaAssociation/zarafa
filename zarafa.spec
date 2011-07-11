@@ -5,7 +5,7 @@
 %define develname %mklibname %{name} -d
 
 %define beta_or_rc 1
-%define actual_release 1
+%define actual_release 2
 %define svnrevision 27791
 
 %define with_clucene 1
@@ -37,7 +37,7 @@ Source0:	http://download.zarafa.com/community/final/7.0/%{version}-%{svnrevision
 Source1:	%{name}.ini
 Source2:	%{name}.logrotate
 Source3:	%{name}-webaccess.conf
-Patch0:		zarafa-7.0.0-package.patch
+Patch0:		zarafa-7.0.0-system_pear.patch
 BuildRequires:	bison
 BuildRequires:	byacc
 BuildRequires:	curl-devel
@@ -269,7 +269,11 @@ Summary:	The Zarafa Indexing service
 Group:		System/Servers
 Requires:	zarafa-common >= %{version}-%{release}
 Requires:	catdoc
+%if %mdkversion < 201000
+Requires:	libxslt-proc
+%else
 Requires:	xsltproc
+%endif
 Requires:	lynx
 Requires:	unzip
 Requires:	poppler
@@ -308,7 +312,7 @@ technology to give a more interactive feeling to the users.
 
 %prep
 %setup -q -n %{name}-%{version}
-%patch0 -p1 -b .package
+%patch0 -p1 -b .pear
 
 %build
 CFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -g -ggdb"
@@ -641,10 +645,10 @@ fi
 %{_includedir}/libzarafasync
 %{_includedir}/%{name}/
 %{_libdir}/pkgconfig/%{name}.pc
-%{_mandir}/man1/zarafa-archiver.1.xz
-%{_mandir}/man1/zarafa-msr.1.xz
-%{_mandir}/man5/zarafa-archiver.cfg.5.xz
-%{_mandir}/man5/zarafa-msr.cfg.5.xz
+%{_mandir}/man1/zarafa-archiver.1.*
+%{_mandir}/man1/zarafa-msr.1.*
+%{_mandir}/man5/zarafa-archiver.cfg.5.*
+%{_mandir}/man5/zarafa-msr.cfg.5.*
 
 
 
