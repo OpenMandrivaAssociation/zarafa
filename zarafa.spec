@@ -5,7 +5,7 @@
 %define develname %mklibname %{name} -d
 
 %define beta_or_rc 1
-%define actual_release 2
+%define actual_release 3
 %define svnrevision 27791
 
 %define with_clucene 1
@@ -37,7 +37,6 @@ Source0:	http://download.zarafa.com/community/final/7.0/%{version}-%{svnrevision
 Source1:	%{name}.ini
 Source2:	%{name}.logrotate
 Source3:	%{name}-webaccess.conf
-Patch0:		zarafa-7.0.0-system_pear.patch
 BuildRequires:	bison
 BuildRequires:	byacc
 BuildRequires:	curl-devel
@@ -71,6 +70,8 @@ BuildRequires:	openldap-devel
 BuildRequires:	xmlto
 %endif
 # The normal zarafa package pulls in all of zarafa
+Requires:	mysql
+Requires:	locales-en
 Requires:	zarafa-ical >= %{version}-%{release}
 Requires:	zarafa-dagent >= %{version}-%{release}
 Requires:	zarafa-gateway >= %{version}-%{release}
@@ -79,6 +80,7 @@ Requires:	zarafa-server >= %{version}-%{release}
 Requires:	zarafa-spooler >= %{version}-%{release}
 Requires:	zarafa-utils >= %{version}-%{release}
 Requires:	zarafa-config >= %{version}-%{release}
+Requires:	zarafa-webaccess >= %{version}-%{release}
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
@@ -189,6 +191,7 @@ Summary:	Zarafa Monitoring service
 Group:		System/Servers
 Requires:	zarafa-client >= %{version}-%{release}
 Requires:	zarafa-common >= %{version}-%{release}
+Requires: 	libicu44 
 Requires(post):     /sbin/chkconfig
 Requires(preun):    /sbin/service
 Requires(preun):    /sbin/chkconfig
@@ -299,7 +302,7 @@ Requires:	php-mapi >= %{version}-%{release}
 %if %mdkversion >= 201010
 BuildArch:	noarch
 %endif
-Requires:	php-pear php-pear-XML_Serializer php-pear-Services_JSON php-pear-XML_Parser
+Requires:	php-pear
 Requires:	php-iconv
 
 %description	webaccess
@@ -312,7 +315,6 @@ technology to give a more interactive feeling to the users.
 
 %prep
 %setup -q -n %{name}-%{version}
-%patch0 -p1 -b .pear
 
 %build
 CFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -g -ggdb"
@@ -440,7 +442,7 @@ mkdir -p %{buildroot}%{_datadir}/%{name}-webaccess/plugins/
 # Remove unwanted language connectors and webaccess files
 rm -f %{buildroot}%{_datadir}/%{name}-webaccess/client/widgets/fckeditor/editor/dialog/fck_spellerpages/spellerpages/server-scripts/spellchecker.{cfm,pl}
 rm -f %{buildroot}%{_datadir}/%{name}-webaccess/{.htaccess,%{name}-webaccess.conf}
-rm -f %{buildroot}%{_libdir}/php/extensions/mapi.*a
+#rm -f %{buildroot}%{_libdir}/php/extensions/mapi.*a
 
 # bork
 install -m0644 doc/zarafa.1 %{buildroot}%{_mandir}/man1/
@@ -450,19 +452,19 @@ install -m0644 installer/linux/ldap.openldap.cfg %{buildroot}%{_sysconfdir}/%{na
 # don't bundle PEAR
 
 # php-pear
-rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/PEAR.php
-rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Util.php
+#rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/PEAR.php
+#rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Util.php
 
 # php-pear-XML_Serializer
-rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Serializer.php
-rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Unserializer.php
+#rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Serializer.php
+#rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Unserializer.php
 
 # php-pear-Services_JSON
-rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/JSON.php
+#rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/JSON.php
 
 # php-pear-XML_Parser
-rm -rf %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Parser
-rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Parser.php
+#rm -rf %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Parser
+#rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Parser.php
 
 %find_lang %{name}
 
@@ -798,6 +800,7 @@ fi
 %{_datadir}/%{name}-webaccess/
 %dir %{_localstatedir}/lib/%{name}-webaccess/
 %attr(-,apache,apache) %dir %{_localstatedir}/lib/%{name}-webaccess/tmp/
+%{_libdir}/php/extensions/mapi.la
 
 %files -n python-MAPI
 %defattr(-,root,root,-)
@@ -809,3 +812,105 @@ fi
 %{py_platsitedir}/_inetmapi*
 %{py_platsitedir}/_licenseclient*
 %{py_platsitedir}/licenseclient.py
+
+%changelog
+* Mon Jul 11 2011 Leonardo Coelho <leonardoc@mandriva.com.br> 7.0.0-0.2.svn27791.1mdv2010.2
++ Revision: 689584
+- fixed problems with dependencies on installation
+
+* Mon Jul 04 2011 Leonardo Coelho <leonardoc@mandriva.com.br> 7.0.0-0.1.svn27791.1
++ Revision: 688677
+- bump new version, remove some upstream patches
+
+* Thu Jun 09 2011 Oden Eriksson <oeriksson@mandriva.com> 6.40.9-0.1.svn27553.1
++ Revision: 683492
+- 6.40.9
+
+* Sat May 21 2011 Oden Eriksson <oeriksson@mandriva.com> 6.40.8-0.1.svn27223.1
++ Revision: 676905
+- 6.40.8
+
+* Sat Apr 02 2011 Oden Eriksson <oeriksson@mandriva.com> 6.40.7-0.1.svn26119.1
++ Revision: 649916
+- 6.40.7
+- don't bundle pear, use the system packages instead
+- fix logrotate and the apache conf
+
+* Thu Mar 17 2011 Oden Eriksson <oeriksson@mandriva.com> 6.40.6-0.1.svn25584.1
++ Revision: 645909
+- relink against libmysqlclient.so.18
+
+* Wed Mar 16 2011 Oden Eriksson <oeriksson@mandriva.com> 6.40.6-0.1.svn25584.0
++ Revision: 645587
+- 6.40.6
+- rediffed zarafa-6.40.0-package.patch
+- added two more sub packages (zarafa-archiver and zarafa-msr)
+- it builds fine on mes5 now, so nuke that autopoo cruft
+- make it actually build on mes5
+
+* Tue Mar 01 2011 Eugeni Dodonov <eugeni@mandriva.com> 6.40.5-0.1.svn24860.0
++ Revision: 641187
+- Update to 6.40.5.
+  Rediff patches.
+  Package python-MAPI, drop perl-MAPI.
+
+* Fri Dec 24 2010 Oden Eriksson <oeriksson@mandriva.com> 6.40.4-0.1.svn24121.0mdv2011.0
++ Revision: 624554
+- 6.40.4-24121
+
+* Thu Nov 11 2010 Oden Eriksson <oeriksson@mandriva.com> 6.40.3-2mdv2011.0
++ Revision: 595937
+- make it backportable
+- 6.40.3
+
+* Tue Aug 31 2010 Oden Eriksson <oeriksson@mandriva.com> 6.40.2-2mdv2011.0
++ Revision: 574892
+- 6.40.2
+
+* Tue Aug 31 2010 Ahmad Samir <ahmadsamir@mandriva.org> 6.40.1-2mdv2011.0
++ Revision: 574874
+- re-enable building mixed arch packages, the BS can handle that now
+  (fixed by blino)
+
+* Mon Aug 30 2010 Oden Eriksson <oeriksson@mandriva.com> 6.40.1-1mdv2011.0
++ Revision: 574458
+- 6.40.1
+- fix #60491
+
+* Sat Jul 24 2010 Jérôme Quelin <jquelin@mandriva.org> 6.40.0-3mdv2011.0
++ Revision: 558110
+- perl 5.12 rebuild
+
+* Mon Jun 21 2010 Oden Eriksson <oeriksson@mandriva.com> 6.40.0-2mdv2010.1
++ Revision: 548408
+- fix build
+
+* Thu Jun 17 2010 Oden Eriksson <oeriksson@mandriva.com> 6.40.0-1mdv2010.1
++ Revision: 548274
+- 6.40.0 (sync with zarafa-6.40.0-2.fc14.src.rpm)
+- rediffed the linkage_fix patch
+
+* Wed Apr 28 2010 Oden Eriksson <oeriksson@mandriva.com> 6.30.13-1mdv2010.1
++ Revision: 540135
+- 6.30.13
+- drop two upstream added patches
+
+* Mon Apr 12 2010 Funda Wang <fwang@mandriva.org> 6.30.12-2mdv2010.1
++ Revision: 533622
+- fix perl module
+- more linkage fix
+
+* Mon Mar 22 2010 Oden Eriksson <oeriksson@mandriva.com> 6.30.12-1mdv2010.1
++ Revision: 526364
+- 6.30.12
+
+* Thu Mar 11 2010 Oden Eriksson <oeriksson@mandriva.com> 6.30.11-1mdv2010.1
++ Revision: 518152
+- 6.30.11
+
+* Tue Mar 09 2010 Oden Eriksson <oeriksson@mandriva.com> 6.30.10-1mdv2010.1
++ Revision: 517183
+- import zarafa
+
+* Tue Mar 09 2010 Oden Eriksson <oeriksson@mandriva.com> 6.30.10-1mdv2010.0
+- initial Mandriva package (fedora import)
