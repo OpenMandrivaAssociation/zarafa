@@ -1,12 +1,12 @@
 %define _disable_ld_as_needed 1
 %define _disable_ld_no_undefined 1
-%define	major 0
-%define	libname %mklibname %{name} %{major}
+%define major 0
+%define libname %mklibname %{name} %{major}
 %define develname %mklibname %{name} -d
 
 %define beta_or_rc 1
-%define actual_release 3
-%define svnrevision 27791
+%define actual_release 1
+%define svnrevision 28479
 
 %define with_clucene 1
 %define with_ldap 1
@@ -14,74 +14,74 @@
 
 %define _requires_exceptions pear(debug.php)\\|pear(mapi/
 %define _provides_exceptions pear(debug.php)\\|pear(mapi/
-%define version 7.0.0
+%define version 7.0.1
 
-Summary:	Zarafa Outlook Sharing and Open Source Collaboration
-Name:		zarafa
-Version:	%{version}
+Summary:        Zarafa Outlook Sharing and Open Source Collaboration
+Name:           zarafa
+Version:        %{version}
 %if %{beta_or_rc}
-Release:	%mkrel 0.%{actual_release}.svn%{svnrevision}.2
+Release:        %mkrel 0.%{actual_release}.svn%{svnrevision}.2
 %else
-Release:	%mkrel %{actual_release}
+Release:        %mkrel %{actual_release}
 %endif
 # Red Hat Legal has been advised by email from Zarafa that no license is
 # required in order to use the letter string "zarafa" (combined with other
 # words) in the package naming, to refer to the software as "Zarafa" to
 # indicate its intended purpose, and to modify packages with bug fixes and
 # enhancements.
-License:	AGPLv3 with exceptions
-Group:		System/Servers
-URL:		http://www.zarafa.com/
+License:        AGPLv3 with exceptions
+Group:          System/Servers
+URL:            http://www.zarafa.com/
 # http://www.zarafa.com/download-community -> "Zarafa Source Package"
-Source0:	http://download.zarafa.com/community/final/7.0/%{version}-%{svnrevision}/sourcecode/zcp-%{version}.tar.gz
-Source1:	%{name}.ini
-Source2:	%{name}.logrotate
-Source3:	%{name}-webaccess.conf
-BuildRequires:	bison
-BuildRequires:	byacc
-BuildRequires:	curl-devel
-BuildRequires:	flex
-BuildRequires:	gettext
-BuildRequires:	libical-devel >= 0.42
+Source0:        http://download.zarafa.com/community/final/7.0/%{version}-%{svnrevision}/sourcecode/zcp-%{version}.tar.gz
+Source1:        %{name}.ini
+Source2:        %{name}.logrotate
+Source3:        %{name}-webaccess.conf
+BuildRequires:  bison
+BuildRequires:  byacc
+BuildRequires:  curl-devel
+BuildRequires:  flex
+BuildRequires:  gettext
+BuildRequires:  libical-devel >= 0.42
 %if %mdkversion >= 201000
-BuildRequires:	libuuid-devel
+BuildRequires:  libuuid-devel
 %endif
 %if %mdkversion == 200900
-BuildRequires:	e2fsprogs-devel
+BuildRequires:  e2fsprogs-devel
 %endif
-BuildRequires:	libvmime-devel >= 0.9.0
-BuildRequires:	libxml2-devel
-BuildRequires:	mysql-devel >= 4.1
-BuildRequires:	ncurses-devel
-BuildRequires:	pam-devel
-BuildRequires:	perl
-BuildRequires:	perl-devel
-BuildRequires:	php-devel >= 3:5.2.0
-BuildRequires:	swig
-BuildRequires:	python-devel
-BuildRequires:	boost-devel
+BuildRequires:  libvmime-devel >= 0.9.0
+BuildRequires:  libxml2-devel
+BuildRequires:  mysql-devel >= 4.1
+BuildRequires:  ncurses-devel
+BuildRequires:  pam-devel
+BuildRequires:  perl
+BuildRequires:  perl-devel
+BuildRequires:  php-devel >= 3:5.2.0
+BuildRequires:  swig
+BuildRequires:  python-devel
+BuildRequires:  boost-devel
 %if %{with_clucene}
-BuildRequires:	clucene-devel >= 0.9.20
+BuildRequires:  clucene-devel >= 0.9.20
 %endif
 %if %{with_ldap}
-BuildRequires:	openldap-devel
+BuildRequires:  openldap-devel
 %endif
 %if %{with_xmlto}
-BuildRequires:	xmlto
+BuildRequires:  xmlto
 %endif
 # The normal zarafa package pulls in all of zarafa
-Requires:	mysql
-Requires:	locales-en
-Requires:	zarafa-ical >= %{version}-%{release}
-Requires:	zarafa-dagent >= %{version}-%{release}
-Requires:	zarafa-gateway >= %{version}-%{release}
-Requires:	zarafa-monitor >= %{version}-%{release}
-Requires:	zarafa-server >= %{version}-%{release}
-Requires:	zarafa-spooler >= %{version}-%{release}
-Requires:	zarafa-utils >= %{version}-%{release}
-Requires:	zarafa-config >= %{version}-%{release}
-Requires:	zarafa-webaccess >= %{version}-%{release}
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
+Requires:       mysql
+Requires:       locales-en
+Requires:       zarafa-ical >= %{version}-%{release}
+Requires:       zarafa-dagent >= %{version}-%{release}
+Requires:       zarafa-gateway >= %{version}-%{release}
+Requires:       zarafa-monitor >= %{version}-%{release}
+Requires:       zarafa-server >= %{version}-%{release}
+Requires:       zarafa-spooler >= %{version}-%{release}
+Requires:       zarafa-utils >= %{version}-%{release}
+Requires:       zarafa-config >= %{version}-%{release}
+Requires:       zarafa-webaccess >= %{version}-%{release}
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
 Zarafa Outlook Sharing is a Microsoft Exchange replacement. The Open Source
@@ -96,197 +96,258 @@ client library as well as programming interfaces for C++, PHP and Perl. The
 other Zarafa related packages need to be installed to gain all the features
 and benefits of Zarafa Outlook Sharing and Open Source Collaboration.
 
-%package	client
-Summary:	Zarafa Client Library
-Group:		System/Servers
-Requires:	zarafa-common >= %{version}-%{release}
+%package        client
+Summary:        Zarafa Client Library
+Group:          System/Servers
+Requires:       zarafa-common >= %{version}-%{release}
 
-%description	client
+%description    client
 Zarafa client libraries for use with integrated MAPI clients.
 
-%package	common
-Summary:	Zarafa common files
-Group:		System/Servers
+%package        common
+Summary:        Zarafa common files
+Group:          System/Servers
 
-%description	common
+%description    common
 Common files and directories required by most Zarafa packages.
 
-%package	dagent
-Summary:	Zarafa Delivery Agent
-Group:		System/Servers
-Requires:	zarafa-client >= %{version}-%{release}
-Requires:	zarafa-common >= %{version}-%{release}
+%package        dagent
+Summary:        Zarafa Delivery Agent
+Group:          System/Servers
+Requires:       zarafa-client >= %{version}-%{release}
+Requires:       zarafa-common >= %{version}-%{release}
 Requires(post):     /sbin/chkconfig
 Requires(preun):    /sbin/service
 Requires(preun):    /sbin/chkconfig
 Requires(postun):   /sbin/service
-Provides:	zarafa-dagent = %{version}-%{release}
+Provides:       zarafa-dagent = %{version}-%{release}
 
-%description	dagent
+%description    dagent
 The delivery agent delivers e-mails into the Zarafa server.
 It can be used to trigger the local mailer or act as the LMTP
 server.
 
-%package -n	%{develname}
-Summary:	Development files for several Zarafa libraries
-Group:		Development/C++
-Requires:	%{name} = %{version}-%{release}, pkgconfig
-Requires:	zarafa-common = %{version}-%{release}
-Provides:	%{name}-devel = %{version}-%{release}
+%package -n     %{develname}
+Summary:        Development files for several Zarafa libraries
 
-%description -n	%{develname}
+# The normal zarafa package pulls in all of zarafa
+Requires:       mysql
+Requires:       locales-en
+Requires:       zarafa-ical >= %{version}-%{release}
+Requires:       zarafa-dagent >= %{version}-%{release}
+Requires:       zarafa-gateway >= %{version}-%{release}
+Requires:       zarafa-monitor >= %{version}-%{release}
+Requires:       zarafa-server >= %{version}-%{release}
+Requires:       zarafa-spooler >= %{version}-%{release}
+Requires:       zarafa-utils >= %{version}-%{release}
+Requires:       zarafa-config >= %{version}-%{release}
+Requires:       zarafa-webaccess >= %{version}-%{release}
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-buildroot
+
+%description
+Zarafa Outlook Sharing is a Microsoft Exchange replacement. The Open Source
+Collaboration provides an integration with your existing Linux mail server,
+native mobile phone support by ActiveSync compatibility and a webaccess with
+'Look & Feel' similar to Outlook using Ajax. Including an IMAP4 and a POP3
+gateway as well as an iCal/CalDAV gateway, Zarafa can combine the usability
+with the stability and flexibility of a Linux server.
+
+The proven Zarafa groupware solution is using MAPI objects, provides a MAPI
+client library as well as programming interfaces for C++, PHP and Perl. The
+other Zarafa related packages need to be installed to gain all the features
+and benefits of Zarafa Outlook Sharing and Open Source Collaboration.
+
+%package        client
+Summary:        Zarafa Client Library
+Group:          System/Servers
+Requires:       zarafa-common >= %{version}-%{release}
+
+%description    client
+Zarafa client libraries for use with integrated MAPI clients.
+
+%package        common
+Summary:        Zarafa common files
+Group:          System/Servers
+
+%description    common
+Common files and directories required by most Zarafa packages.
+
+%package        dagent
+Summary:        Zarafa Delivery Agent
+Group:          System/Servers
+Requires:       zarafa-client >= %{version}-%{release}
+Requires:       zarafa-common >= %{version}-%{release}
+Requires(post):     /sbin/chkconfig
+Requires(preun):    /sbin/service
+Requires(preun):    /sbin/chkconfig
+Requires(postun):   /sbin/service
+Provides:       zarafa-dagent = %{version}-%{release}
+
+%description    dagent
+The delivery agent delivers e-mails into the Zarafa server.
+It can be used to trigger the local mailer or act as the LMTP
+server.
+
+%package -n     %{develname}
+Summary:        Development files for several Zarafa libraries
+Group:          Development/C++
+Requires:       %{name} = %{version}-%{release}, pkgconfig
+Requires:       zarafa-common = %{version}-%{release}
+Provides:       %{name}-devel = %{version}-%{release}
+
+%description -n %{develname}
 The zarafa-devel package includes header files and libraries necessary for
 developing programs which use features from the Zarafa Outlook Sharing and
 Open Source Collaboration. The proven Zarafa groupware solution is using
 MAPI objects, provides a MAPI client library and programming interfaces for
 C++, PHP and Perl.
 
-%package	gateway
-Summary:	Zarafa Gateway server (POP3/IMAP access)
-Group:		System/Servers
-Requires:	zarafa-client >= %{version}-%{release}
-Requires:	zarafa-common >= %{version}-%{release}
+%package        gateway
+Summary:        Zarafa Gateway server (POP3/IMAP access)
+Group:          System/Servers
+Requires:       zarafa-client >= %{version}-%{release}
+Requires:       zarafa-common >= %{version}-%{release}
 Requires(post):     /sbin/chkconfig
 Requires(preun):    /sbin/service
 Requires(preun):    /sbin/chkconfig
 Requires(postun):   /sbin/service
 
-%description	gateway
+%description    gateway
 The gateway enables other e-mail clients to connect through
 POP3 or IMAP to the Zarafa server to read their e-mail. With
 IMAP, it is also possible to view the contents of shared
 folders and subfolders. The gateway can be configured to
 listen for POP3, POP3S, IMAP and/or IMAPS.
 
-%package	ical
-Summary:	The Zarafa iCal/CalDAV gateway
-Group:		System/Servers
-Requires:	zarafa-client >= %{version}-%{release}
-Requires:	zarafa-common >= %{version}-%{release}
+%package        ical
+Summary:        The Zarafa iCal/CalDAV gateway
+Group:          System/Servers
+Requires:       zarafa-client >= %{version}-%{release}
+Requires:       zarafa-common >= %{version}-%{release}
 Requires(post):     /sbin/chkconfig
 Requires(preun):    /sbin/service
 Requires(preun):    /sbin/chkconfig
 Requires(postun):   /sbin/service
-Provides:	zarafa-caldav = %{version}-%{release}
+Provides:       zarafa-caldav = %{version}-%{release}
 
-%description	ical
+%description    ical
 The iCal/CalDAV gateway enables users to retrieve their
 calendar using iCalendar compliant clients. The iCal/CalDAV
 gateway can be configured to listen for HTTP and HTTPS
 requests.
 
-%package	caldav
-Summary:	The Zarafa iCal/CalDAV gateway
-Group:		System/Servers
-Requires:	zarafa-ical >= %{version}-%{release}
+%package        caldav
+Summary:        The Zarafa iCal/CalDAV gateway
+Group:          System/Servers
+Requires:       zarafa-ical >= %{version}-%{release}
 
-%description	caldav
+%description    caldav
 The iCal/CalDAV gateway enables users to retrieve their
 calendar using iCalendar compliant clients. The iCal/CalDAV
 gateway can be configured to listen for HTTP and HTTPS
 requests.
 
-%package	monitor
-Summary:	Zarafa Monitoring service
-Group:		System/Servers
-Requires:	zarafa-client >= %{version}-%{release}
-Requires:	zarafa-common >= %{version}-%{release}
-Requires: 	libicu44 
+%package        monitor
+Summary:        Zarafa Monitoring service
+Group:          System/Servers
+Requires:       zarafa-client >= %{version}-%{release}
+Requires:       zarafa-common >= %{version}-%{release}
+Requires:       libicu44
 Requires(post):     /sbin/chkconfig
 Requires(preun):    /sbin/service
 Requires(preun):    /sbin/chkconfig
 Requires(postun):   /sbin/service
 
-%description	monitor
+%description    monitor
 The monitor checks user mailbox sizes. When a quotum is reached
 the monitor sends a quota notification email.
 
-%package	server
-Summary:	Zarafa Backend Server
-Group:		System/Servers
-Requires:	zarafa-common >= %{version}-%{release}
+%package        server
+Summary:        Zarafa Backend Server
+Group:          System/Servers
+Requires:       zarafa-common >= %{version}-%{release}
 Requires(post):     /sbin/chkconfig
 Requires(preun):    /sbin/service
 Requires(preun):    /sbin/chkconfig
 Requires(postun):   /sbin/service
-Provides:	zarafa-config = %{version}-%{release}
+Provides:       zarafa-config = %{version}-%{release}
 
-%description	server
+%description    server
 The Zarafa groupware backend server
 
-%package	spooler
-Summary:	Zarafa Spooler Service
-Group:		System/Servers
-Requires:	zarafa-client >= %{version}-%{release}
-Requires:	zarafa-common >= %{version}-%{release}
+%package        spooler
+Summary:        Zarafa Spooler Service
+Group:          System/Servers
+Requires:       zarafa-client >= %{version}-%{release}
+Requires:       zarafa-common >= %{version}-%{release}
 Requires(post):     /sbin/chkconfig
 Requires(preun):    /sbin/service
 Requires(preun):    /sbin/chkconfig
 Requires(postun):   /sbin/service
 
-%description	spooler
+%description    spooler
 The spooler sends all pending Zarafa e-mail to the recipients,
 from the Outbox of a user/all users.
 
-%package	utils
-Summary:	Zarafa Utilities
-Group:		System/Servers
-Requires:	zarafa-client >= %{version}-%{release}
-Requires:	zarafa-common >= %{version}-%{release}
+%package        utils
+Summary:        Zarafa Utilities
+Group:          System/Servers
+Requires:       zarafa-client >= %{version}-%{release}
+Requires:       zarafa-common >= %{version}-%{release}
 
-%description	utils
+%description    utils
 Administration utilities for the Zarafa Groupware environment
 including reporting and password management.
 
-%package -n	%{libname}
-Summary:	Mapi libraries by Zarafa
-Group:		System/Libraries
-Requires:	zarafa-client >= %{version}-%{release}
+%package -n     %{libname}
+Summary:        Mapi libraries by Zarafa
+Group:          System/Libraries
+Requires:       zarafa-client >= %{version}-%{release}
 Requires(post):     /sbin/ldconfig
 Requires(postun):   /sbin/ldconfig
 
 %description -n %{libname}
 MAPI libraries by Zarafa.
 
-%package -n	python-MAPI
-Summary:	Python Mapi extension libraries by Zarafa
-Group:		Development/Python
-Requires:	python
+%package -n     python-MAPI
+Summary:        Python Mapi extension libraries by Zarafa
+Group:          Development/Python
+Requires:       python
 
-%description -n	python-MAPI
+%description -n python-MAPI
 Python MAPI extension libraries by Zarafa.
 
-%package -n	php-mapi
-Summary:	A PHP Mapi client by Zarafa
-Group:		Development/PHP
+%package -n     php-mapi
+Summary:        A PHP Mapi client by Zarafa
+Group:          Development/PHP
 # Bug: Without mod_ssl, reloading httpd causes core dump
-Requires:	apache-mod_ssl
-Requires:	apache-mod_php >= 5.2
+Requires:       apache-mod_ssl
+Requires:       apache-mod_php >= 5.2
 
 %description -n php-mapi
 PHP MAPI extension by Zarafa to enable MAPI communication in PHP.
 
 %if %{with_clucene}
-%package	indexer
-Summary:	The Zarafa Indexing service
-Group:		System/Servers
-Requires:	zarafa-common >= %{version}-%{release}
-Requires:	catdoc
+%package        indexer
+Summary:        The Zarafa Indexing service
+Group:          System/Servers
+Requires:       zarafa-common >= %{version}-%{release}
+Requires:       catdoc
 %if %mdkversion < 201000
-Requires:	libxslt-proc
+Requires:       libxslt-proc
 %else
-Requires:	xsltproc
+Requires:       xsltproc
 %endif
-Requires:	lynx
-Requires:	unzip
-Requires:	poppler
-Requires:	file
+Requires:       lynx
+Requires:       unzip
+Requires:       poppler
+Requires:       file
 Requires(post):  /sbin/chkconfig
 Requires(preun): /sbin/service
 Requires(preun):  /sbin/chkconfig
 Requires(postun): /sbin/service
 
-%description	indexer
+%description    indexer
 The zarafa-indexer package includes the Zarafa Indexing service for fast
 and full-text searching. Using CLucene search engine, this service makes
 an index per user of messages and attachments for the Zarafa server. At
@@ -294,24 +355,38 @@ search queries, the server will use this index to quickly find messages,
 items and even in contents of attached documents.
 %endif
 
-%package	webaccess
-Summary:	Zarafa Webaccess featuring a 'Look & Feel' similar to Outlook
-Group:		Development/PHP
-Requires:	apache-mod_php >= 5.2
-Requires:	php-mapi >= %{version}-%{release}
+%package        webaccess
+Summary:        Zarafa Webaccess featuring a 'Look & Feel' similar to Outlook
+Group:          Development/PHP
+Requires:       apache-mod_php >= 5.2
+Requires:       php-mapi >= %{version}-%{release}
 %if %mdkversion >= 201010
-BuildArch:	noarch
+BuildArch:      noarch
 %endif
-Requires:	php-pear
-Requires:	php-iconv
+Requires:       php-pear
+Requires:       php-iconv
 
-%description	webaccess
+%description    webaccess
 Zarafa Webaccess features the familiar Outlook 'Look & Feel' interface
 and you can keep using the features in Outlook that have always allowed
 you to work efficiently. View your e-mail, calendar and contacts via a
 web browser. And opening your colleagues calendar or sending a meeting
 request is only a piece of cake. The Zarafa Webaccess is using the ajax
 technology to give a more interactive feeling to the users.
+
+%package	archiver
+Summary:	Manages zarafa archives and perfoms the archive operation
+Group:		System/Servers
+Requires:	zarafa-client >= %{version}-%{release}
+Requires:	zarafa-common >= %{version}-%{release}
+Requires:	zarafa-utils >= %{version}-%{release}
+
+%description 	archiver
+This tool is used to attach or detach archives to a users store.
+An archive is defined as a special non-active store or a folder inside such a store.
+
+On top of managing archives, this tool is used to perfom the actual archive operation
+Using the -u option, the archiver can be instructed to archive a single store or all stores.
 
 %prep
 %setup -q -n %{name}-%{version}
@@ -812,6 +887,12 @@ fi
 %{py_platsitedir}/_inetmapi*
 %{py_platsitedir}/_licenseclient*
 %{py_platsitedir}/licenseclient.py
+
+%files archiver
+%defattr(-,root,root-)
+%doc installer/licenseagreement/AGPL-3
+%config(noreplace) %attr(0640,%{name},%{name}) %{_sysconfdir}/%{name}/archiver.cfg
+%{_bindir}/%{name}-archiver
 
 %changelog
 * Mon Jul 11 2011 Leonardo Coelho <leonardoc@mandriva.com.br> 7.0.0-0.2.svn27791.1mdv2010.2
