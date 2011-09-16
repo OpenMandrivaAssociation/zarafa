@@ -5,7 +5,7 @@
 %define develname %mklibname %{name} -d
 
 %define beta_or_rc 1
-%define actual_release 1
+%define actual_release 2
 %define svnrevision 28479
 
 %define with_clucene 1
@@ -37,6 +37,7 @@ Source0:        http://download.zarafa.com/community/final/7.0/%{version}-%{svnr
 Source1:        %{name}.ini
 Source2:        %{name}.logrotate
 Source3:        %{name}-webaccess.conf
+Patch0:		zarafa-7.0.0-system_pear.patch
 BuildRequires:  bison
 BuildRequires:  byacc
 BuildRequires:  curl-devel
@@ -390,6 +391,7 @@ Using the -u option, the archiver can be instructed to archive a single store or
 
 %prep
 %setup -q -n %{name}-%{version}
+%patch0 -p1 -b .pear
 
 %build
 CFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -g -ggdb"
@@ -527,19 +529,19 @@ install -m0644 installer/linux/ldap.openldap.cfg %{buildroot}%{_sysconfdir}/%{na
 # don't bundle PEAR
 
 # php-pear
-#rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/PEAR.php
-#rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Util.php
+rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/PEAR.php
+rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Util.php
 
 # php-pear-XML_Serializer
-#rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Serializer.php
-#rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Unserializer.php
+rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Serializer.php
+rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Unserializer.php
 
 # php-pear-Services_JSON
-#rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/JSON.php
+rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/JSON.php
 
 # php-pear-XML_Parser
-#rm -rf %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Parser
-#rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Parser.php
+rm -rf %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Parser
+rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Parser.php
 
 %find_lang %{name}
 
