@@ -130,67 +130,6 @@ server.
 
 %package -n     %{develname}
 Summary:        Development files for several Zarafa libraries
-
-# The normal zarafa package pulls in all of zarafa
-Requires:       mysql
-Requires:       locales-en
-Requires:       zarafa-ical >= %{version}-%{release}
-Requires:       zarafa-dagent >= %{version}-%{release}
-Requires:       zarafa-gateway >= %{version}-%{release}
-Requires:       zarafa-monitor >= %{version}-%{release}
-Requires:       zarafa-server >= %{version}-%{release}
-Requires:       zarafa-spooler >= %{version}-%{release}
-Requires:       zarafa-utils >= %{version}-%{release}
-Requires:       zarafa-config >= %{version}-%{release}
-Requires:       zarafa-webaccess >= %{version}-%{release}
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-buildroot
-
-%description
-Zarafa Outlook Sharing is a Microsoft Exchange replacement. The Open Source
-Collaboration provides an integration with your existing Linux mail server,
-native mobile phone support by ActiveSync compatibility and a webaccess with
-'Look & Feel' similar to Outlook using Ajax. Including an IMAP4 and a POP3
-gateway as well as an iCal/CalDAV gateway, Zarafa can combine the usability
-with the stability and flexibility of a Linux server.
-
-The proven Zarafa groupware solution is using MAPI objects, provides a MAPI
-client library as well as programming interfaces for C++, PHP and Perl. The
-other Zarafa related packages need to be installed to gain all the features
-and benefits of Zarafa Outlook Sharing and Open Source Collaboration.
-
-%package        client
-Summary:        Zarafa Client Library
-Group:          System/Servers
-Requires:       zarafa-common >= %{version}-%{release}
-
-%description    client
-Zarafa client libraries for use with integrated MAPI clients.
-
-%package        common
-Summary:        Zarafa common files
-Group:          System/Servers
-
-%description    common
-Common files and directories required by most Zarafa packages.
-
-%package        dagent
-Summary:        Zarafa Delivery Agent
-Group:          System/Servers
-Requires:       zarafa-client >= %{version}-%{release}
-Requires:       zarafa-common >= %{version}-%{release}
-Requires(post):     /sbin/chkconfig
-Requires(preun):    /sbin/service
-Requires(preun):    /sbin/chkconfig
-Requires(postun):   /sbin/service
-Provides:       zarafa-dagent = %{version}-%{release}
-
-%description    dagent
-The delivery agent delivers e-mails into the Zarafa server.
-It can be used to trigger the local mailer or act as the LMTP
-server.
-
-%package -n     %{develname}
-Summary:        Development files for several Zarafa libraries
 Group:          Development/C++
 Requires:       %{name} = %{version}-%{release}, pkgconfig
 Requires:       zarafa-common = %{version}-%{release}
