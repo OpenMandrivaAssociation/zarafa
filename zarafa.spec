@@ -6,7 +6,7 @@
 
 %define beta_or_rc 1
 %define actual_release 2
-%define svnrevision 28479
+%define svnrevision 29470
 
 %define with_clucene 1
 %define with_ldap 1
@@ -14,13 +14,13 @@
 
 %define _requires_exceptions pear(debug.php)\\|pear(mapi/
 %define _provides_exceptions pear(debug.php)\\|pear(mapi/
-%define version 7.0.1
+%define version 7.0.2
 
 Summary:        Zarafa Outlook Sharing and Open Source Collaboration
 Name:           zarafa
 Version:        %{version}
 %if %{beta_or_rc}
-Release:        %mkrel 0.%{actual_release}.svn%{svnrevision}.2
+Release:        %mkrel 0.%{actual_release}.svn%{svnrevision}.1
 %else
 Release:        %mkrel %{actual_release}
 %endif
