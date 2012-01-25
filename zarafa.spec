@@ -20,9 +20,9 @@ Summary:        Zarafa Outlook Sharing and Open Source Collaboration
 Name:           zarafa
 Version:        %{version}
 %if %{beta_or_rc}
-Release:        %mkrel 0.%{actual_release}.svn%{svnrevision}.1
+Release:        0.%{actual_release}.svn%{svnrevision}.1
 %else
-Release:        %mkrel %{actual_release}
+Release:        %{actual_release}
 %endif
 # Red Hat Legal has been advised by email from Zarafa that no license is
 # required in order to use the letter string "zarafa" (combined with other
@@ -82,7 +82,6 @@ Requires:       zarafa-spooler >= %{version}-%{release}
 Requires:       zarafa-utils >= %{version}-%{release}
 Requires:       zarafa-config >= %{version}-%{release}
 Requires:       zarafa-webaccess >= %{version}-%{release}
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
 Zarafa Outlook Sharing is a Microsoft Exchange replacement. The Open Source
@@ -351,8 +350,6 @@ export CFLAGS
 %make
 
 %install
-rm -rf %{buildroot}
-
 make \
     docdir=%{_datadir}/doc/%{name}/ \
     datarootdir=%{_datadir} \
@@ -484,9 +481,6 @@ rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Parser.php
 
 %find_lang %{name}
 
-%clean
-rm -rf %{buildroot}
-
 %pre common
 getent group %{name} > /dev/null || %{_sbindir}/groupadd -r %{name}
 getent passwd %{name} > /dev/null || %{_sbindir}/useradd -r -g %{name} -d %{_localstatedir}/lib/%{name} -s /sbin/nologin -c "Zarafa Service Account" %{name}
@@ -600,30 +594,18 @@ if [ "$1" = "0" ]; then
     fi
 fi
 
-%if %mdkversion < 200900
-%post -n %{libname} -p /sbin/ldconfig
-%endif
-
-%if %mdkversion < 200900
-%postun -n %{libname} -p /sbin/ldconfig
-%endif
-
 %files
-%defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
 
 %files caldav
-%defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
 
 %files client
-%defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
 %{_libdir}/libzarafaclient.so
 %{_mandir}/man1/za-aclsync.1.*
 
 %files common
-%defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
 %dir %{_sysconfdir}/%{name}/
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
@@ -634,7 +616,6 @@ fi
 %dir %attr(0755,%{name},%{name}) %{_localstatedir}/log/%{name}/
 
 %files dagent
-%defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3 installer/linux/createuser.dotforward
 %{_bindir}/%{name}-autorespond
 %{_bindir}/%{name}-dagent
@@ -645,7 +626,6 @@ fi
 %{_mandir}/man5/%{name}-dagent.cfg.5*
 
 %files -n %{develname}
-%defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
 %{_libdir}/libarchiver.so
 %{_libdir}/libicalmapi.so
@@ -668,10 +648,7 @@ fi
 %{_mandir}/man5/zarafa-archiver.cfg.5.*
 %{_mandir}/man5/zarafa-msr.cfg.5.*
 
-
-
 %files gateway
-%defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
 %{_bindir}/%{name}-gateway
 %config(noreplace) %attr(0640,%{name},%{name}) %{_sysconfdir}/%{name}/gateway.cfg
@@ -680,7 +657,6 @@ fi
 %{_mandir}/man5/%{name}-gateway.cfg.5*
 
 %files ical
-%defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
 %{_bindir}/%{name}-ical
 %config(noreplace) %attr(0640,%{name},%{name}) %{_sysconfdir}/%{name}/ical.cfg
@@ -689,7 +665,6 @@ fi
 %{_mandir}/man5/%{name}-ical.cfg.5*
 
 %files monitor
-%defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
 %{_bindir}/%{name}-monitor
 %config(noreplace) %attr(0640,%{name},%{name}) %{_sysconfdir}/%{name}/monitor.cfg
@@ -705,7 +680,6 @@ fi
 %{_mandir}/man5/%{name}-monitor.cfg.5*
 
 %files server -f %{name}.lang
-%defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
 %{_bindir}/%{name}-server
 %config(noreplace) %attr(0640,%{name},%{name}) %{_sysconfdir}/%{name}/server.cfg
@@ -748,7 +722,6 @@ fi
 %{_datadir}/%{name}/audit-parse.pl
 
 %files spooler
-%defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
 %{_bindir}/%{name}-spooler
 %config(noreplace) %attr(0640,%{name},%{name}) %{_sysconfdir}/%{name}/spooler.cfg
@@ -757,7 +730,6 @@ fi
 %{_mandir}/man5/%{name}-spooler.cfg.5*
 
 %files utils
-%defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
 %{_bindir}/%{name}-admin
 %{_bindir}/%{name}-fsck
@@ -772,7 +744,6 @@ fi
 %{_mandir}/man1/%{name}-stats.1*
 
 %files -n %{libname}
-%defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
 %{_libdir}/libarchiver.so.*
 %{_libdir}/libicalmapi.so.*
@@ -780,7 +751,6 @@ fi
 %{_libdir}/libmapi.so.*
 
 %files -n php-mapi
-%defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
 %config(noreplace) %{_sysconfdir}/php.d/%{name}.ini
 %{_datadir}/php/mapi/
@@ -788,7 +758,6 @@ fi
 
 %if %{with_clucene}
 %files indexer
-%defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
 %{_bindir}/%{name}-indexer
 %config(noreplace) %attr(0640,%{name},%{name}) %{_sysconfdir}/%{name}/indexer.cfg
@@ -807,7 +776,6 @@ fi
 %endif
 
 %files webaccess
-%defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
 %config(noreplace) %{_sysconfdir}/httpd/conf/webapps.d/%{name}-webaccess.conf
 %dir %{_sysconfdir}/%{name}/
@@ -819,7 +787,6 @@ fi
 %{_libdir}/php/extensions/mapi.la
 
 %files -n python-MAPI
-%defattr(-,root,root,-)
 %doc installer/licenseagreement/AGPL-3
 %{py_platsitedir}/*MAPI*
 %{py_platsitedir}/icalmapi*
@@ -830,7 +797,6 @@ fi
 %{py_platsitedir}/licenseclient.py
 
 %files archiver
-%defattr(-,root,root-)
 %doc installer/licenseagreement/AGPL-3
 %config(noreplace) %attr(0640,%{name},%{name}) %{_sysconfdir}/%{name}/archiver.cfg
 %{_bindir}/%{name}-archiver
