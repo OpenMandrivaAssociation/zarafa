@@ -20,7 +20,7 @@ Summary:        Zarafa Outlook Sharing and Open Source Collaboration
 Name:           zarafa
 Version:        %{version}
 %if %{beta_or_rc}
-Release:        0.%{actual_release}.svn%{svnrevision}.1
+Release:        0.%{actual_release}.svn%{svnrevision}.2
 %else
 Release:        %{actual_release}
 %endif
