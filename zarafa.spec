@@ -364,8 +364,8 @@ make \
     install-ajax-webaccess
 
 # Nuke all overlefts from licensed, managed or other proprietary items
-rm -rf %{buildroot}%{_sysconfdir}/%{name}/{license,licensed.cfg,report-ca}
-rm -f %{buildroot}%{_mandir}/man?/zarafa-{backup,restore,report,ldapms.cfg,licensed{,.cfg}}.*
+rm -rf %{buildroot}%{_sysconfdir}/{%{name}/{license,licensed.cfg,report-ca},cron.daily/%{name}-client-update}
+rm -f %{buildroot}%{_mandir}/man?/{zarafa-{backup,restore,report,msr,ldapms.cfg,licensed{,.cfg}},za-aclsync}.*
 
 # Move all the initscripts to their appropriate place and
 # ensure that all services are off by default at boot time
@@ -607,11 +607,15 @@ fi
 %files client
 %doc installer/licenseagreement/AGPL-3
 %{_libdir}/libzarafaclient.so
-%{_mandir}/man1/za-aclsync.1.*
+%{_libdir}/libzarafacontacts.so
+%{_libdir}/libzarafasync.so.*
 
 %files common
 %doc installer/licenseagreement/AGPL-3
 %dir %{_sysconfdir}/%{name}/
+%dir %{_sysconfdir}/mapi/
+%config(noreplace) %{_sysconfdir}/mapi/zarafa.inf
+%config(noreplace) %{_sysconfdir}/mapi/zcontacts.inf
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %dir %{_libdir}/%{name}/
 %{_mandir}/man1/%{name}.1*
@@ -639,7 +643,7 @@ fi
 %{_libdir}/libcommon_ssl.a
 %{_libdir}/libcommon_util.a
 %{_libdir}/libfreebusy.a
-%{_libdir}/libzarafasync.a
+%{_libdir}/libzarafasync.so
 %{_includedir}/icalmapi/
 %{_includedir}/inetmapi/
 %{_includedir}/mapi4linux/
@@ -648,9 +652,7 @@ fi
 %{_includedir}/%{name}/
 %{_libdir}/pkgconfig/%{name}.pc
 %{_mandir}/man1/zarafa-archiver.1.*
-%{_mandir}/man1/zarafa-msr.1.*
 %{_mandir}/man5/zarafa-archiver.cfg.5.*
-%{_mandir}/man5/zarafa-msr.cfg.5.*
 
 %files gateway
 %doc installer/licenseagreement/AGPL-3
@@ -736,6 +738,7 @@ fi
 %files utils
 %doc installer/licenseagreement/AGPL-3
 %{_bindir}/%{name}-admin
+%{_bindir}/%{name}-mr-accept
 %{_bindir}/%{name}-fsck
 %{_bindir}/%{name}-passwd
 %{_bindir}/%{name}-stats
@@ -763,7 +766,7 @@ fi
 %if %{with_clucene}
 %files indexer
 %doc installer/licenseagreement/AGPL-3
-%{_bindir}/%{name}-indexer
+#%{_bindir}/%{name}-indexer
 %config(noreplace) %attr(0640,%{name},%{name}) %{_sysconfdir}/%{name}/indexer.cfg
 %{_sysconfdir}/rc.d/init.d/%{name}-indexer
 %dir %{_sysconfdir}/%{name}/indexerscripts/
