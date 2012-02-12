@@ -4,7 +4,7 @@
 %define libname %mklibname %{name} %{major}
 %define develname %mklibname %{name} -d
 
-%define beta_or_rc 1
+%define beta_or_rc 0
 %define actual_release 1
 %define svnrevision 31880
 
