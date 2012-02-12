@@ -43,6 +43,7 @@ Patch0:		zarafa-7.0.0-system_pear.patch
 Patch1:		zarafa-7.0.3-boost149.patch
 Patch2:		zarafa-7.0.5-gzfile-function-casting.patch
 Patch3:		zarafa-7.0.4-fd_setsize.patch
+Patch4:		zarafa-6.40.5-rpath.patch
 BuildRequires:	bison
 BuildRequires:	byacc
 BuildRequires:	curl-devel
@@ -349,6 +350,7 @@ Using the -u option, the archiver can be instructed to archive a single store or
 %patch1 -p1 -b .boost149~
 %patch2 -p1 -b .cast~
 %patch3 -p1 -b .fd_setsize~
+%patch4 -p1 -b .rpath~
 autoconf -f
 
 %build
