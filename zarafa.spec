@@ -502,6 +502,9 @@ rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Parser.php
 
 %find_lang %{name}
 
+# XXX: why desn't spec-helper script take care of removing this..?
+find %{buildroot} -name \*.la | xargs rm -f
+
 %pre common
 getent group %{name} > /dev/null || %{_sbindir}/groupadd -r %{name}
 getent passwd %{name} > /dev/null || %{_sbindir}/useradd -r -g %{name} -d %{_localstatedir}/lib/%{name} -s /sbin/nologin -c "Zarafa Service Account" %{name}
@@ -814,7 +817,6 @@ fi
 %{_datadir}/%{name}-webaccess/
 %dir %{_localstatedir}/lib/%{name}-webaccess/
 %attr(-,apache,apache) %dir %{_localstatedir}/lib/%{name}-webaccess/tmp/
-%{_libdir}/php/extensions/mapi.la
 
 %files -n python-MAPI
 %doc installer/licenseagreement/AGPL-3
