@@ -38,6 +38,7 @@ Source1:        %{name}.ini
 Source2:        %{name}.logrotate
 Source3:        %{name}-webaccess.conf
 Patch0:		zarafa-7.0.0-system_pear.patch
+Patch1:		zarafa-7.0.3-boost149.patch
 BuildRequires:  bison
 BuildRequires:  byacc
 BuildRequires:  curl-devel
@@ -330,6 +331,8 @@ Using the -u option, the archiver can be instructed to archive a single store or
 %prep
 %setup -q -n %{name}-%{version}
 %patch0 -p1 -b .pear
+%patch1 -p1 -b .boost149~
+autoconf -f
 
 %build
 CFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -g -ggdb"
