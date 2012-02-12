@@ -5,8 +5,8 @@
 %define develname %mklibname %{name} -d
 
 %define beta_or_rc 1
-%define actual_release 2
-%define svnrevision 29470
+%define actual_release 1
+%define svnrevision 31880
 
 %define with_clucene 1
 %define with_ldap 1
@@ -14,7 +14,7 @@
 
 %define _requires_exceptions pear(debug.php)\\|pear(mapi/
 %define _provides_exceptions pear(debug.php)\\|pear(mapi/
-%define version 7.0.2
+%define version 7.0.5
 
 Summary:        Zarafa Outlook Sharing and Open Source Collaboration
 Name:           zarafa
