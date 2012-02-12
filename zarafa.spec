@@ -345,7 +345,7 @@ On top of managing archives, this tool is used to perfom the actual archive oper
 Using the -u option, the archiver can be instructed to archive a single store or all stores.
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q
 %patch0 -p1 -b .pear
 %patch1 -p1 -b .boost149~
 %patch2 -p1 -b .cast~
