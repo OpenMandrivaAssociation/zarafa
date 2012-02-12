@@ -16,6 +16,8 @@
 %define _provides_exceptions pear(debug.php)\\|pear(mapi/
 %define version 7.0.5
 
+%bcond_without	perl
+
 Summary:        Zarafa Outlook Sharing and Open Source Collaboration
 Name:           zarafa
 Version:        %{version}
@@ -258,6 +260,17 @@ Requires:       python
 %description -n python-MAPI
 Python MAPI extension libraries by Zarafa.
 
+%if %{with perl}
+%package -n	perl-MAPI
+Summary:	The Perl MAPI extension by Zarafa
+Group:		Development/Libraries
+%rename		perl-libmapi
+
+%description -n	perl-MAPI
+The perl-MAPI package contains the Perl MAPI extension to provide access
+to Microsoft MAPI functions while using Perl.
+%endif
+
 %package -n     php-mapi
 Summary:        A PHP Mapi client by Zarafa
 Group:          Development/PHP
@@ -349,7 +362,11 @@ CFLAGS="%{optflags} -fno-strict-aliasing" \
     --disable-testtools \
     --enable-unicode \
     --enable-python \
+%if %{with perl}
+    --enable-perl \
+%else
     --disable-perl
+%endif
 
 %make
 
@@ -756,6 +773,12 @@ fi
 %{_libdir}/libicalmapi.so.*
 %{_libdir}/libinetmapi.so.*
 %{_libdir}/libmapi.so.*
+
+%if %{with perl}
+%files -n perl-MAPI
+%dir %{perl_vendorarch}/auto/MAPICore/
+%{perl_vendorarch}/auto/MAPICore/MAPICore.so
+%endif
 
 %files -n php-mapi
 %doc installer/licenseagreement/AGPL-3
