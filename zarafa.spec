@@ -335,8 +335,7 @@ Using the -u option, the archiver can be instructed to archive a single store or
 autoconf -f
 
 %build
-CFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -g -ggdb"
-export CFLAGS
+CFLAGS="%{optflags} -fno-strict-aliasing" \
 %configure2_5x \
     --with-userscript-prefix=%{_sysconfdir}/%{name}/userscripts \
     --with-quotatemplate-prefix=%{_sysconfdir}/%{name}/quotamail \
