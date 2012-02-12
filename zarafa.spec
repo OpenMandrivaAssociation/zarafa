@@ -339,10 +339,12 @@ Requires:	zarafa-utils >= %{version}-%{release}
 
 %description 	archiver
 This tool is used to attach or detach archives to a users store.
-An archive is defined as a special non-active store or a folder inside such a store.
+An archive is defined as a special non-active store or a folder inside such a
+store.
 
-On top of managing archives, this tool is used to perfom the actual archive operation
-Using the -u option, the archiver can be instructed to archive a single store or all stores.
+On top of managing archives, this tool is used to perfom the actual archive
+operation Using the -u option, the archiver can be instructed to archive a
+single store or all stores.
 
 %prep
 %setup -q
