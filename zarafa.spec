@@ -126,7 +126,6 @@ Requires(post):	/sbin/chkconfig
 Requires(preun):/sbin/service
 Requires(preun):/sbin/chkconfig
 Requires(postun):/sbin/service
-Provides:	zarafa-dagent = %{version}-%{release}
 
 %description	dagent
 The delivery agent delivers e-mails into the Zarafa server.
