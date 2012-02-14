@@ -197,7 +197,6 @@ Summary:	Zarafa Monitoring service
 Group:		System/Servers
 Requires:	zarafa-client >= %{version}-%{release}
 Requires:	zarafa-common >= %{version}-%{release}
-Requires:	libicu44
 Requires(post):	/sbin/chkconfig
 Requires(preun):/sbin/service
 Requires(preun):/sbin/chkconfig
