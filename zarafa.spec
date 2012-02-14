@@ -39,6 +39,7 @@ Source0:	http://download.zarafa.com/community/final/7.0/%{version}-%{svnrevision
 Source1:	%{name}.ini
 Source2:	%{name}.logrotate
 Source3:	%{name}-webaccess.conf
+Source4:	%{name}.rpmlintrc
 Patch0:		zarafa-7.0.0-system_pear.patch
 Patch1:		zarafa-7.0.3-boost149.patch
 Patch2:		zarafa-7.0.5-gzfile-function-casting.patch
