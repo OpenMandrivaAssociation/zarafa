@@ -265,7 +265,7 @@ Python MAPI extension libraries by Zarafa.
 %if %{with perl}
 %package -n	perl-MAPI
 Summary:	The Perl MAPI extension by Zarafa
-Group:		Development/Libraries
+Group:		Development/Perl
 %rename		perl-libmapi
 
 %description -n	perl-MAPI
