@@ -47,29 +47,29 @@ Patch3:		zarafa-7.0.4-fd_setsize.patch
 Patch4:		zarafa-6.40.5-rpath.patch
 BuildRequires:	bison
 BuildRequires:	byacc
-BuildRequires:	curl-devel
+BuildRequires:	pkgconfig(libcurl)
 BuildRequires:	flex
 BuildRequires:	gettext
-BuildRequires:	libical-devel >= 0.42
+BuildRequires:	pkgconfig(libical) >= 0.42
 %if %mdkversion >= 201000
-BuildRequires:	libuuid-devel
+BuildRequires:	pkgconfig(uuid)
 %endif
 %if %mdkversion == 200900
-BuildRequires:	e2fsprogs-devel
+BuildRequires:	pkgconfig(ext2fs)
 %endif
-BuildRequires:	libvmime-devel >= 0.9.0
-BuildRequires:	libxml2-devel
+BuildRequires:	pkgconfig(vmime) >= 0.9.0
+BuildRequires:	pkgconfig(libxml-2.0)
 BuildRequires:	mysql-devel >= 4.1
-BuildRequires:	ncurses-devel
+BuildRequires:	pkgconfig(ncurses)
 BuildRequires:	pam-devel
 BuildRequires:	perl
 BuildRequires:	perl-devel
 BuildRequires:	php-devel >= 3:5.2.0
 BuildRequires:	swig
-BuildRequires:	python-devel
+BuildRequires:	pkgconfig(python)
 BuildRequires:	boost-devel
 %if %{with_clucene}
-BuildRequires:	clucene-devel >= 0.9.20
+BuildRequires:	pkgconfig(libclucene-core) >= 0.9.20
 %endif
 %if %{with_ldap}
 BuildRequires:	openldap-devel
