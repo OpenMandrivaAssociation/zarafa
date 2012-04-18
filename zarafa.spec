@@ -12,9 +12,14 @@
 %define with_ldap 1
 %define with_xmlto 1
 
+%if %{_use_internal_dependency_generator}
+%define __noautoreq 'pear\\(debug.php\\)|pear\\(mapi/'
+%define __noautoprov 'pear\\(debug.php\\)|pear\\(mapi/'
+%else
 %define _requires_exceptions pear(debug.php)\\|pear(mapi/
 %define _provides_exceptions pear(debug.php)\\|pear(mapi/
-%define version 7.0.5
+%endif
+%define version 7.0.6
 
 %bcond_without	perl
 
@@ -41,7 +46,7 @@ Source2:	%{name}.logrotate
 Source3:	%{name}-webaccess.conf
 Source4:	%{name}.rpmlintrc
 Patch0:		zarafa-7.0.0-system_pear.patch
-Patch1:		zarafa-7.0.3-boost149.patch
+Patch1:		zarafa-7.0.6-boost149.patch
 Patch2:		zarafa-7.0.5-gzfile-function-casting.patch
 Patch3:		zarafa-7.0.4-fd_setsize.patch
 Patch4:		zarafa-6.40.5-rpath.patch
@@ -51,12 +56,7 @@ BuildRequires:	pkgconfig(libcurl)
 BuildRequires:	flex
 BuildRequires:	gettext
 BuildRequires:	pkgconfig(libical) >= 0.42
-%if %mdkversion >= 201000
 BuildRequires:	pkgconfig(uuid)
-%endif
-%if %mdkversion == 200900
-BuildRequires:	pkgconfig(ext2fs)
-%endif
 BuildRequires:	pkgconfig(vmime) >= 0.9.0
 BuildRequires:	pkgconfig(libxml-2.0)
 BuildRequires:	mysql-devel >= 4.1
@@ -227,7 +227,7 @@ Requires:	zarafa-common >= %{version}-%{release}
 Requires(post):	   /sbin/chkconfig
 Requires(preun):   /sbin/service
 Requires(preun):   /sbin/chkconfig
-Requires(postun):   /sbin/service
+Requires(postun):  /sbin/service
 
 %description	spooler
 The spooler sends all pending Zarafa e-mail to the recipients,
@@ -288,11 +288,7 @@ Summary:	The Zarafa Indexing service
 Group:		System/Servers
 Requires:	zarafa-common >= %{version}-%{release}
 Requires:	catdoc
-%if %mdkversion < 201000
-Requires:	libxslt-proc
-%else
 Requires:	xsltproc
-%endif
 Requires:	lynx
 Requires:	unzip
 Requires:	poppler
@@ -315,9 +311,7 @@ Summary:	Zarafa Webaccess featuring a 'Look & Feel' similar to Outlook
 Group:		Development/PHP
 Requires:	apache-mod_php >= 5.2
 Requires:	php-mapi >= %{version}-%{release}
-%if %mdkversion >= 201010
 BuildArch:	noarch
-%endif
 Requires:	php-pear
 Requires:	php-iconv
 
@@ -387,7 +381,7 @@ make \
 
 # Nuke all overlefts from licensed, managed or other proprietary items
 rm -rf %{buildroot}%{_sysconfdir}/{%{name}/{license,licensed.cfg,report-ca},cron.daily/%{name}-client-update}
-rm -f %{buildroot}%{_mandir}/man?/{zarafa-{backup,restore,report,msr,ldapms.cfg,licensed{,.cfg}},za-aclsync}.*
+rm -f %{buildroot}%{_mandir}/man?/{zarafa-{backup,restore,report,msr*,ldapms.cfg,licensed{,.cfg}},za-aclsync}.*
 
 # Move all the initscripts to their appropriate place and
 # ensure that all services are off by default at boot time
