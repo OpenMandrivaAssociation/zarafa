@@ -505,37 +505,36 @@ rm -f %{buildroot}%{_datadir}/%{name}-webaccess/server/PEAR/XML/Parser.php
 find %{buildroot} -name \*.la | xargs rm -f
 
 %pre common
-getent group %{name} > /dev/null || %{_sbindir}/groupadd -r %{name}
-getent passwd %{name} > /dev/null || %{_sbindir}/useradd -r -g %{name} -d %{_localstatedir}/lib/%{name} -s /sbin/nologin -c "Zarafa Service Account" %{name}
-exit 0
+%_pre_groupadd %{name}
+%_pre_useradd %{name} %{_localstatedir}/lib/%{name} /sbin/nologin
 
 %post dagent
-[ $1 -eq 1 ] && /sbin/chkconfig --add %{name}-dagent
+%_post_service %{name}-dagent %{name}-dagent.service
 # Ensure correct log file ownership after upgrade from official packages
 chown %{name}:%{name} %{_localstatedir}/log/%{name}/dagent.* > /dev/null 2>&1 || :
 
 %post ical
-[ $1 -eq 1 ] && /sbin/chkconfig --add %{name}-ical
+%_post_service %{name}-ical %{name}-ical.service
 # Ensure correct log file ownership after upgrade from official packages
 chown %{name}:%{name} %{_localstatedir}/log/%{name}/ical.* > /dev/null 2>&1 || :
 
 %post gateway
-[ $1 -eq 1 ] && /sbin/chkconfig --add %{name}-gateway
+%_post_service %{name}-gateway %{name}-gateway.service
 # Ensure correct log file ownership after upgrade from official packages
 chown %{name}:%{name} %{_localstatedir}/log/%{name}/gateway.* > /dev/null 2>&1 || :
 
 %post monitor
-[ $1 -eq 1 ] && /sbin/chkconfig --add %{name}-monitor
+%_post_service %{name}-monitor %{name}-monitor.service
 # Ensure correct log file ownership after upgrade from official packages
 chown %{name}:%{name} %{_localstatedir}/log/%{name}/monitor.* > /dev/null 2>&1 || :
 
 %post server
-[ $1 -eq 1 ] && /sbin/chkconfig --add %{name}-server
+%_post_service %{name}-server %{name}-server.service
 # Ensure correct log file ownership after upgrade from official packages
 chown %{name}:%{name} %{_localstatedir}/log/%{name}/server.* > /dev/null 2>&1 || :
 
 %post spooler
-[ $1 -eq 1 ] && /sbin/chkconfig --add %{name}-spooler
+%_post_service %{name}-spooler %{name}-spooler.service
 # Ensure correct log file ownership after upgrade from official packages
 chown %{name}:%{name} %{_localstatedir}/log/%{name}/spooler.* > /dev/null 2>&1 || :
 
