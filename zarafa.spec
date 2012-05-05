@@ -5,7 +5,7 @@
 %define develname %mklibname %{name} -d
 
 %define beta_or_rc 0
-%define actual_release 2
+%define actual_release 1
 %define svnrevision 31880
 
 %define with_clucene 1
@@ -19,7 +19,7 @@
 %define _requires_exceptions pear(debug.php)\\|pear(mapi/
 %define _provides_exceptions pear(debug.php)\\|pear(mapi/
 %endif
-%define version 7.0.6
+%define version 7.0.7
 
 %bcond_without	perl
 
@@ -48,7 +48,7 @@ Source4:	%{name}.rpmlintrc
 Patch0:		zarafa-7.0.0-system_pear.patch
 Patch1:		zarafa-7.0.6-boost149.patch
 Patch2:		zarafa-7.0.5-gzfile-function-casting.patch
-Patch3:		zarafa-7.0.4-fd_setsize.patch
+Patch3:		zarafa-7.0.7-fd_setsize.patch
 Patch4:		zarafa-6.40.5-rpath.patch
 BuildRequires:	bison
 BuildRequires:	byacc
