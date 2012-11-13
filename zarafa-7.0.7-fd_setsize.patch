@@ -1,0 +1,26 @@
+Index: zarafa-7.0.7/common/platform.h
+===================================================================
+--- zarafa-7.0.7.orig/common/platform.h
++++ zarafa-7.0.7/common/platform.h
+@@ -57,7 +57,7 @@
+   #ifndef _FORTIFY_SOURCE
+   #include <bits/types.h>
+   #undef __FD_SETSIZE
+-  #define __FD_SETSIZE 8192
++  #define __FD_SETSIZE 1024
+   #endif
+ 
+   // Log the pthreads locks
+Index: zarafa-7.0.7/provider/soap/soapdefs.h
+===================================================================
+--- zarafa-7.0.7.orig/provider/soap/soapdefs.h
++++ zarafa-7.0.7/provider/soap/soapdefs.h
+@@ -14,7 +14,7 @@
+ #ifndef _FORTIFY_SOURCE
+ # include <bits/types.h>
+ # undef __FD_SETSIZE
+-# define __FD_SETSIZE 8192
++# define __FD_SETSIZE 1024
+ #endif
+ 
+ #endif // ndef SOAPDEFS_H_

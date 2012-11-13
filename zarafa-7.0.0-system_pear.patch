@@ -1,0 +1,24 @@
+diff -p -up zarafa-7.0.0/php-webclient-ajax/server/core/class.xmlparser.php-system_pear zarafa-7.0.0/php-webclient-ajax/server/core/class.xmlparser.php
+--- zarafa-7.0.0/php-webclient-ajax/server/core/class.xmlparser.php	2011-06-28 15:37:28.000000000 -0300
++++ zarafa-7.0.0/php-webclient-ajax/server/core/class.xmlparser.php	2011-06-28 15:37:56.000000000 -0300
+@@ -50,7 +50,7 @@
+ 
+ ?>
+ <?php
+-	require_once("server/PEAR/XML/Unserializer.php");
++	require_once("XML/Unserializer.php");
+ 
+ 	/**
+ 	* XML Parser
+diff -p -up zarafa-7.0.0/php-webclient-ajax/zarafa.php-system_pear zarafa-7.0.0/php-webclient-ajax/zarafa.php
+--- zarafa-7.0.0/php-webclient-ajax/zarafa.php	2011-06-28 15:47:48.000000000 -0300
++++ zarafa-7.0.0/php-webclient-ajax/zarafa.php	2011-06-28 15:48:23.000000000 -0300
+@@ -59,7 +59,7 @@
+ 	include("config.php");
+ 	include("defaults.php");
+ 	include("server/util.php");
+-	require("server/PEAR/JSON.php");
++	require("Services/JSON.php");
+ 	
+ 	require("mapi/mapi.util.php");
+ 	require("mapi/mapicode.php");

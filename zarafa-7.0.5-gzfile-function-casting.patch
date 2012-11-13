@@ -1,0 +1,15 @@
+--- zarafa-7.0.5/common/ECLogger.cpp.cast~	2012-02-12 21:20:35.957603199 +0100
++++ zarafa-7.0.5/common/ECLogger.cpp	2012-02-12 21:20:50.659609376 +0100
+@@ -166,9 +166,9 @@ ECLogger_File::ECLogger_File(int max_ll,
+ 		szMode = NULL;
+ 	} else {
+ 		if (compress) {
+-			fnOpen = &gzopen;
+-			fnClose = &gzclose;
+-			fnPrintf = &gzprintf;
++			fnOpen = (open_func)(&gzopen);
++			fnClose = (close_func)(&gzclose);
++			fnPrintf = (printf_func)(&gzprintf);
+ 			fnFileno = NULL;
+ 			fnFlush = NULL;	// gzflush does exist, but degrades performance
+ 			szMode = "wb";
