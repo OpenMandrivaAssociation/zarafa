@@ -38,7 +38,7 @@ Release:	%{actual_release}
 # enhancements.
 License:	AGPLv3 with exceptions
 Group:		System/Servers
-URL:		http://www.zarafa.com/
+URL:		https://www.zarafa.com/
 # http://www.zarafa.com/download-community -> "Zarafa Source Package"
 Source0:	http://download.zarafa.com/community/final/7.0/%{version}-%{svnrevision}/sourcecode/zcp-%{version}.tar.gz
 Source1:	%{name}.ini
