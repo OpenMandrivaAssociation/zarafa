@@ -50,6 +50,11 @@ Patch1:		zarafa-7.0.6-boost149.patch
 Patch2:		zarafa-7.0.5-gzfile-function-casting.patch
 Patch3:		zarafa-7.0.7-fd_setsize.patch
 Patch4:		zarafa-6.40.5-rpath.patch
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	libtool-base
+BuildRequires:	slibtool
+BuildRequires:	make
 BuildRequires:	bison
 BuildRequires:	byacc
 BuildRequires:	pkgconfig(libcurl)
